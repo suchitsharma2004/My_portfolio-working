@@ -10,6 +10,7 @@ DEBUG = False
 
 # Vercel domain will be added here
 ALLOWED_HOSTS = [
+    '*',  # Allow all hosts for Vercel (you can restrict this later)
     '.vercel.app',
     '.now.sh',
     'localhost',
