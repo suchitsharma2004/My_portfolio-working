@@ -1,0 +1,144 @@
+{% extends 'portfolio/base.html' %}
+
+{% block title %}About Me - Suchit's Portfolio{% endblock %}
+
+{% block content %}
+<div class="mac-window fade-in-up">
+  <div class="window-header">
+    <div class="window-controls">
+      <div class="control-button close"></div>
+      <div class="control-button minimize"></div>
+      <div class="control-button maximize"></div>
+    </div>
+    <div class="window-title">About Me.app</div>
+  </div>
+  <div class="window-content">
+    <div class="row">
+      <div class="col-md-4 text-center mb-4">
+        <div class="profile-image">
+          👨‍💻
+        </div>
+        <h3 class="mt-3">Suchit Sharma</h3>
+        <p class="text-muted">Full Stack Developer</p>
+        <div class="d-flex justify-content-center gap-3 mt-3">
+          <a href="#" class="btn btn-outline-primary btn-sm">🐙 GitHub</a>
+          <a href="#" class="btn btn-outline-info btn-sm">💼 LinkedIn</a>
+          <a href="#" class="btn btn-outline-success btn-sm">📧 Email</a>
+        </div>
+      </div>
+      <div class="col-md-8">
+        <h4>👋 Hello, I'm Suchit!</h4>
+        <p class="text-muted">
+          I'm a passionate full-stack developer with a love for creating innovative web applications 
+          and mobile solutions. My journey in tech started with curiosity and has evolved into a 
+          career focused on building user-centric digital experiences.
+        </p>
+        
+        <h5 class="mt-4">🎯 What I Do</h5>
+        <ul class="text-muted">
+          <li>Build responsive web applications using modern frameworks</li>
+          <li>Develop mobile apps with React Native and Flutter</li>
+          <li>Design scalable backend systems with Django and Node.js</li>
+          <li>Implement cloud solutions and DevOps practices</li>
+          <li>Create intuitive user interfaces and experiences</li>
+        </ul>
+
+        <h5 class="mt-4">🚀 Currently Learning</h5>
+        <div class="d-flex flex-wrap gap-2">
+          <span class="badge bg-primary">Machine Learning</span>
+          <span class="badge bg-success">Kubernetes</span>
+          <span class="badge bg-warning">GraphQL</span>
+          <span class="badge bg-info">TypeScript</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mac-window fade-in-up" style="animation-delay: 0.2s;">
+  <div class="window-header">
+    <div class="window-controls">
+      <div class="control-button close"></div>
+      <div class="control-button minimize"></div>
+      <div class="control-button maximize"></div>
+    </div>
+    <div class="window-title">Skills.app</div>
+  </div>
+  <div class="window-content">
+    <div class="skills-grid">
+      <div class="skill-card">
+        <div class="skill-icon">🐍</div>
+        <div class="skill-name">Python</div>
+        <div class="skill-level">
+          <div class="skill-progress" style="width: 90%;"></div>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">⚛️</div>
+        <div class="skill-name">React</div>
+        <div class="skill-level">
+          <div class="skill-progress" style="width: 85%;"></div>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">🟢</div>
+        <div class="skill-name">Node.js</div>
+        <div class="skill-level">
+          <div class="skill-progress" style="width: 80%;"></div>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">🗄️</div>
+        <div class="skill-name">Database</div>
+        <div class="skill-level">
+          <div class="skill-progress" style="width: 75%;"></div>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">☁️</div>
+        <div class="skill-name">AWS</div>
+        <div class="skill-level">
+          <div class="skill-progress" style="width: 70%;"></div>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">🎨</div>
+        <div class="skill-name">UI/UX</div>
+        <div class="skill-level">
+          <div class="skill-progress" style="width: 65%;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mac-window fade-in-up" style="animation-delay: 0.4s;">
+  <div class="window-header">
+    <div class="window-controls">
+      <div class="control-button close"></div>
+      <div class="control-button minimize"></div>
+      <div class="control-button maximize"></div>
+    </div>
+    <div class="window-title">Experience.app</div>
+  </div>
+  <div class="window-content">
+    <div class="timeline">
+      <div class="mb-4">
+        <h6 class="text-primary">2023 - Present</h6>
+        <h5>Senior Full Stack Developer</h5>
+        <p class="text-muted small">Leading development of web applications and mentoring junior developers. Specialized in React, Django, and cloud architecture.</p>
+      </div>
+      <div class="mb-4">
+        <h6 class="text-primary">2021 - 2023</h6>
+        <h5>Full Stack Developer</h5>
+        <p class="text-muted small">Developed and maintained multiple client projects using modern web technologies. Worked with cross-functional teams to deliver high-quality solutions.</p>
+      </div>
+      <div class="mb-4">
+        <h6 class="text-primary">2020 - 2021</h6>
+        <h5>Junior Developer</h5>
+        <p class="text-muted small">Started my professional journey building responsive websites and learning best practices in software development.</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

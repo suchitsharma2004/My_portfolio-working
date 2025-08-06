@@ -1,0 +1,183 @@
+{% extends 'portfolio/base.html' %}
+
+        <div class="mb-4">
+          <h6>🌐 Connect With Me</h6>
+          <div class="d-flex gap-3">
+            <a href="https://github.com/suchitsharma2004" target="_blank" class="btn btn-outline-dark btn-sm">
+              💻 GitHub
+            </a>
+            <a href="https://www.linkedin.com/in/suchit-sharma2004/" target="_blank" class="btn btn-outline-primary btn-sm">
+              💼 LinkedIn
+            </a>
+          </div>
+        </div>tle %}Contact - Suchit's Portfolio{% endblock %}
+
+{% block content %}
+<div class="mac-window fade-in-up">
+  <div class="window-header">
+    <div class="window-controls">
+      <div class="control-button close"></div>
+      <div class="control-button minimize"></div>
+      <div class="control-button maximize"></div>
+    </div>
+    <div class="window-title">Contact Me.app</div>
+  </div>
+  <div class="window-content">
+    <div class="row">
+      <div class="col-md-6">
+        <h4>📬 Get In Touch</h4>
+        <p class="text-muted mb-4">
+          I'm always open to discussing new opportunities, interesting projects, or just having a chat about technology.
+        </p>
+        
+        <div class="mb-4">
+          <h6>📧 Email</h6>
+          <p class="text-muted">suchit.sharma.delhi@gmail.com</p>
+        </div>
+        
+        <div class="mb-4">
+          <h6>📱 Phone</h6>
+          <p class="text-muted">+91 9311294118</p>
+        </div>
+        
+        <div class="mb-4">
+          <h6>📍 Location</h6>
+          <p class="text-muted">Delhi, India</p>
+        </div>
+        
+        <div class="mb-4">
+          <h6>🌐 Connect With Me</h6>
+          <div class="d-flex gap-3">
+            <a href="https://github.com/suchitsharma2004" target="_blank" class="btn btn-outline-dark btn-sm">
+              � GitHub
+            </a>
+            <a href="https://www.linkedin.com/in/suchit-sharma2004/" target="_blank" class="btn btn-outline-primary btn-sm">
+              � LinkedIn
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-6">
+        {% if success %}
+          <div class="alert alert-success" role="alert">
+            <strong>Success!</strong> {{ message }}
+          </div>
+        {% elif error %}
+          <div class="alert alert-danger" role="alert">
+            <strong>Error!</strong> {{ message }}
+          </div>
+        {% endif %}
+        
+        <form method="post" action="{% url 'contact' %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="subject" class="form-label">Subject</label>
+            <input type="text" class="form-control" id="subject" name="subject" required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="message" class="form-label">Message</label>
+            <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+          </div>
+          
+          <button type="submit" class="btn btn-primary">
+            📤 Send Message
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mac-window fade-in-up" style="animation-delay: 0.2s;">
+  <div class="window-header">
+    <div class="window-controls">
+      <div class="control-button close"></div>
+      <div class="control-button minimize"></div>
+      <div class="control-button maximize"></div>
+    </div>
+    <div class="window-title">Let's Work Together.app</div>
+  </div>
+  <div class="window-content">
+    <div class="row text-center">
+      <div class="col-md-4 mb-4">
+        <div class="skill-card">
+          <div class="skill-icon">💼</div>
+          <h6>Full-time Opportunities</h6>
+          <p class="text-muted small">
+            Looking for exciting full-time roles in web development and software engineering.
+          </p>
+        </div>
+      </div>
+      
+      <div class="col-md-4 mb-4">
+        <div class="skill-card">
+          <div class="skill-icon">🚀</div>
+          <h6>Freelance Projects</h6>
+          <p class="text-muted small">
+            Available for freelance web development, mobile app development, and consulting projects.
+          </p>
+        </div>
+      </div>
+      
+      <div class="col-md-4 mb-4">
+        <div class="skill-card">
+          <div class="skill-icon">🤝</div>
+          <h6>Collaboration</h6>
+          <p class="text-muted small">
+            Open to collaborating on open source projects and innovative tech solutions.
+          </p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="text-center mt-4">
+      <h5>⚡ Response Time</h5>
+      <p class="text-muted">
+        I typically respond to emails within 24 hours. For urgent matters, feel free to connect with me on LinkedIn.
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="mac-window fade-in-up" style="animation-delay: 0.4s;">
+  <div class="window-header">
+    <div class="window-controls">
+      <div class="control-button close"></div>
+      <div class="control-button minimize"></div>
+      <div class="control-button maximize"></div>
+    </div>
+    <div class="window-title">Available Times.app</div>
+  </div>
+  <div class="window-content">
+    <div class="row">
+      <div class="col-md-6">
+        <h6>🕒 Best Times to Reach Me</h6>
+        <ul class="list-unstyled text-muted">
+          <li><strong>Monday - Friday:</strong> 9:00 AM - 6:00 PM IST</li>
+          <li><strong>Saturday:</strong> 10:00 AM - 2:00 PM IST</li>
+          <li><strong>Sunday:</strong> Available for urgent matters only</li>
+        </ul>
+      </div>
+      <div class="col-md-6">
+        <h6>🌍 Time Zone</h6>
+        <p class="text-muted">
+          Currently based in <strong>Delhi, India (UTC+5:30)</strong><br>
+          Available for remote work globally
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

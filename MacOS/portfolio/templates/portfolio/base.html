@@ -1,0 +1,1278 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}macOS Desktop{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'portfolio/css/styles.css' %}">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script>
+    // Wallpaper Manager
+    class WallpaperManager {
+      constructor() {
+        // Available wallpapers in your folder
+        // Add more wallpapers here when you add them to the folder
+        this.availableWallpapers = [
+          '{% static "portfolio/images/wallpapers/wallpaper1-dark.jpg" %}',
+          '{% static "portfolio/images/wallpapers/wallpaper1-light.jpg" %}',
+          '{% static "portfolio/images/wallpapers/wallpaper2-light.jpg" %}',
+          '{% static "portfolio/images/wallpapers/wallpaper2-dark.jpg" %}',
+          // When you add more wallpapers, add them like this:
+          // ,'{% static "portfolio/images/wallpapers/your-new-wallpaper.jpg" %}'
+        ];
+        this.currentWallpaperIndex = 0;
+        this.init();
+      }
+      
+      init() {
+        // Load saved wallpaper or use default
+        const savedWallpaper = localStorage.getItem('currentWallpaper');
+        if (savedWallpaper && this.availableWallpapers.includes(savedWallpaper)) {
+          this.setWallpaper(savedWallpaper);
+        } else {
+          // Use the first wallpaper as default
+          this.setWallpaper(this.availableWallpapers[0]);
+        }
+      }
+      
+      setWallpaper(wallpaperUrl) {
+        document.documentElement.style.setProperty('--wallpaper-url', `url("${wallpaperUrl}")`);
+        localStorage.setItem('currentWallpaper', wallpaperUrl);
+        
+        // Update current index
+        this.currentWallpaperIndex = this.availableWallpapers.indexOf(wallpaperUrl);
+        if (this.currentWallpaperIndex === -1) this.currentWallpaperIndex = 0;
+      }
+      
+      nextWallpaper() {
+        this.currentWallpaperIndex = (this.currentWallpaperIndex + 1) % this.availableWallpapers.length;
+        const nextWallpaper = this.availableWallpapers[this.currentWallpaperIndex];
+        this.setWallpaper(nextWallpaper);
+        return nextWallpaper;
+      }
+      
+      getAllWallpapers() {
+        return this.availableWallpapers;
+      }
+    }
+
+    // Theme management
+    const themeManager = {
+      init() {
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        this.setTheme(savedTheme);
+      },
+      
+      setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+        // Update System Preferences display if it's open
+        this.updateThemeDisplay();
+      },
+      
+      updateThemeDisplay() {
+        const themeSpan = document.getElementById('currentTheme');
+        if (themeSpan) {
+          themeSpan.textContent = document.documentElement.getAttribute('data-theme');
+        }
+      },
+      
+      toggle() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        this.setTheme(newTheme);
+        // Show notification about theme change
+        if (window.desktopManager) {
+          window.desktopManager.showNotification('Theme Changed', `Switched to ${newTheme} mode`);
+        }
+        return newTheme;
+      }
+    };
+
+    // Update time every second
+    function updateTime() {
+      const now = new Date();
+      const time = now.toLocaleTimeString('en-US', { 
+        hour12: true, 
+        hour: 'numeric', 
+        minute: '2-digit' 
+      });
+      const date = now.toLocaleDateString('en-US', { 
+        weekday: 'short', 
+        month: 'short', 
+        day: 'numeric' 
+      });
+      const timeDisplay = document.querySelector('.time-display');
+      if (timeDisplay) {
+        timeDisplay.innerHTML = `${date} <span class="time-separator">|</span> ${time}`;
+      }
+    }
+    setInterval(updateTime, 1000);
+
+    // Initialize managers on page load
+    let wallpaperManager;
+    document.addEventListener('DOMContentLoaded', function() {
+      themeManager.init();
+      wallpaperManager = new WallpaperManager();
+      window.wallpaperManager = wallpaperManager; // Make it globally accessible
+      
+      // Create a MutationObserver to watch for theme changes
+      const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+            // Update theme display in any open System Preferences windows
+            themeManager.updateThemeDisplay();
+          }
+        });
+      });
+      
+      // Start observing theme changes on the html element
+      observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['data-theme']
+      });
+    });
+  </script>
+</head>
+<body>
+
+  <!-- Loading Screen -->
+  <div id="loadingScreen" class="loading-screen">
+    <div class="loading-content">
+      <div class="loading-gif">
+        <img src="{% static 'portfolio/images/icons/apple/load.gif' %}" alt="Loading..." class="loading-animation">
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Desktop Content (initially hidden) -->
+  <div id="desktopContent" class="desktop-content">
+    <!-- macOS-style Top Bar -->
+  <div class="top-bar d-flex justify-content-between align-items-center px-3 py-1">
+    <!-- Apple Menu in Corner -->
+    <div class="system-menu">
+      <button class="menu-button" onclick="toggleSystemMenu()">
+        <img src="{% static 'portfolio/images/icons/apple/new-apple.png' %}" 
+             alt="Apple" 
+             class="apple-logo"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+        <span style="display: none;">🍎</span>
+      </button>
+      <div class="menu-dropdown" id="systemMenu">
+        <div class="menu-item" onclick="openAboutWindow()">
+          <img src="{% static 'portfolio/images/icons/system/info.svg' %}" 
+               alt="Info" 
+               class="menu-icon-svg"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+          <span class="menu-icon" style="display: none;">ℹ️</span>
+          <span>About This Mac</span>
+        </div>
+        <div class="menu-item separator"></div>
+        <div class="menu-item" onclick="changeWallpaper()">
+          <img src="{% static 'portfolio/images/icons/system/wallpaper.svg' %}" 
+               alt="Wallpaper" 
+               class="menu-icon-svg"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+          <span class="menu-icon" style="display: none;">🖼️</span>
+          <span>Change Wallpaper</span>
+        </div>
+        <div class="menu-item" onclick="showSystemPreferences()">
+          <img src="{% static 'portfolio/images/icons/system/settings.svg' %}" 
+               alt="Settings" 
+               class="menu-icon-svg"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+          <span class="menu-icon" style="display: none;">⚙️</span>
+          <span>System Preferences</span>
+        </div>
+        <div class="menu-item separator"></div>
+        <div class="menu-item" onclick="closeAllWindows()">
+          <img src="{% static 'portfolio/images/icons/system/close.svg' %}" 
+               alt="Close" 
+               class="menu-icon-svg"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+          <span class="menu-icon" style="display: none;">❌</span>
+          <span>Close All Windows</span>
+        </div>
+        <div class="menu-item" onclick="showAllWindows()">
+          <img src="{% static 'portfolio/images/icons/system/windows.svg' %}" 
+               alt="Windows" 
+               class="menu-icon-svg"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+          <span class="menu-icon" style="display: none;">📱</span>
+          <span>Show All Windows</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="center-title">Suchit's macOS Desktop</div>
+    <div class="right-status">
+      <img src="{% static 'portfolio/images/icons/apple/control-centre.png' %}" 
+           alt="Control Center" 
+           class="status-icon control-center-btn"
+           onclick="themeManager.toggle()"
+           title="Control Center - Toggle Theme"
+           onerror="this.style.display='none';">
+      <img src="{% static 'portfolio/images/icons/apple/wifi-logo-white.svg' %}" 
+           alt="WiFi" 
+           class="status-icon"
+           onerror="this.style.display='none';">
+      <img src="{% static 'portfolio/images/icons/apple/battery-white.svg' %}" 
+           alt="Battery" 
+           class="status-icon"
+           onerror="this.style.display='none';">
+      <span class="battery-fallback" style="display: none;">🔋</span>
+      <span class="time-display">Wed Aug 6 <span class="time-separator">|</span> 8:45 PM</span>
+    </div>
+  </div>
+
+  <!-- Desktop Area -->
+  <div class="desktop">
+    {% block content %}
+    <!-- Default empty desktop - windows will be loaded by JavaScript -->
+    {% endblock %}
+  </div>
+
+  <!-- macOS Dock -->
+  <div class="dock">
+    <div class="dock-item" data-app="finder" onclick="openApp('finder')" title="Finder">
+      <img src="{% static 'portfolio/images/icons/apps/finder.png' %}" 
+           alt="Finder" 
+           class="dock-icon"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+      <span class="emoji-fallback" style="display: none;">📁</span>
+    </div>
+    <div class="dock-item" data-app="home" onclick="openApp('home')" title="Portfolio Home">
+      <img src="{% static 'portfolio/images/icons/apps/home.png' %}" 
+           alt="Home" 
+           class="dock-icon"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+      <span class="emoji-fallback" style="display: none;">🏠</span>
+    </div>
+    <div class="dock-item" data-app="projects" onclick="openApp('projects')" title="My Projects">
+      <img src="{% static 'portfolio/images/icons/apps/projects.png' %}" 
+           alt="Projects" 
+           class="dock-icon"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+      <span class="emoji-fallback" style="display: none;">💼</span>
+    </div>
+    <div class="dock-item" data-app="contact" onclick="openApp('contact')" title="Contact">
+      <img src="{% static 'portfolio/images/icons/apps/contact.svg' %}" 
+           alt="Contact" 
+           class="dock-icon"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+      <span class="emoji-fallback" style="display: none;">📧</span>
+    </div>
+    <div class="dock-item" data-app="terminal" onclick="openApp('terminal')" title="Terminal">
+      <img src="{% static 'portfolio/images/icons/apps/terminal.png' %}" 
+           alt="Terminal" 
+           class="dock-icon"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+      <span class="emoji-fallback" style="display: none;">💻</span>
+    </div>
+    <div class="dock-item" onclick="openTrash()" title="Trash">
+      <img src="{% static 'portfolio/images/icons/apps/trash-empty.png' %}" 
+           alt="Trash" 
+           class="dock-icon"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+      <span class="emoji-fallback" style="display: none;">🗑️</span>
+    </div>
+  </div>
+
+  <script>
+    // Desktop App Manager
+    class DesktopManager {
+      constructor() {
+        this.openWindows = {};
+        this.windowCounter = 0;
+        this.zIndexCounter = 1000;
+        this.dragData = { isDragging: false, startX: 0, startY: 0, startLeft: 0, startTop: 0 };
+        this.animationFrame = null;
+        this.init();
+      }
+
+      init() {
+        updateTime();
+        this.setupEventListeners();
+      }
+
+      setupEventListeners() {
+        // Window control buttons
+        document.addEventListener('click', (e) => {
+          if (e.target.classList.contains('control-button')) {
+            const window = e.target.closest('.mac-window');
+            const buttonType = this.getButtonType(e.target);
+            this.handleWindowControl(window, buttonType);
+          }
+        });
+
+        // Window header double-tap to maximize
+        document.addEventListener('dblclick', (e) => {
+          if (e.target.closest('.window-header')) {
+            const window = e.target.closest('.mac-window');
+            this.toggleMaximizeWindow(window);
+            e.preventDefault();
+          }
+        });
+
+        // Bring window to front when clicked
+        document.addEventListener('mousedown', (e) => {
+          const window = e.target.closest('.mac-window');
+          if (window) {
+            this.bringToFront(window);
+            
+            // Start dragging if clicking on window header (but not on control buttons)
+            if (e.target.closest('.window-header') && !e.target.closest('.control-button') && !window.classList.contains('maximized')) {
+              this.startDrag(e, window);
+            }
+          }
+        });
+
+        // Handle drag movement
+        document.addEventListener('mousemove', (e) => {
+          if (this.dragData.isDragging) {
+            e.preventDefault();
+            
+            // Use requestAnimationFrame for smooth dragging
+            if (this.animationFrame) {
+              cancelAnimationFrame(this.animationFrame);
+            }
+            
+            this.animationFrame = requestAnimationFrame(() => {
+              this.handleDrag(e);
+            });
+          }
+        });
+
+        // End dragging
+        document.addEventListener('mouseup', () => {
+          this.endDrag();
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+          if (!e.target.closest('.system-menu')) {
+            document.getElementById('systemMenu').classList.remove('show');
+          }
+        });
+      }
+
+      getButtonType(button) {
+        if (button.classList.contains('close')) return 'close';
+        if (button.classList.contains('maximize')) return 'maximize';
+        return null;
+      }
+
+      bringToFront(window) {
+        this.zIndexCounter++;
+        window.style.zIndex = this.zIndexCounter;
+        
+        // Remove active class from all windows
+        document.querySelectorAll('.mac-window').forEach(w => w.classList.remove('active'));
+        // Add active class to current window
+        window.classList.add('active');
+      }
+
+      handleWindowControl(window, action) {
+        const windowId = window.dataset.windowId || `window-${++this.windowCounter}`;
+        window.dataset.windowId = windowId;
+
+        switch (action) {
+          case 'close':
+            this.closeWindow(window, windowId);
+            break;
+          case 'maximize':
+            this.toggleMaximizeWindow(window);
+            break;
+        }
+      }
+
+      closeWindow(window, windowId) {
+        window.classList.add('closed');
+        setTimeout(() => {
+          window.remove();
+          delete this.openWindows[windowId];
+          this.updateDockIndicators();
+          this.showNotification('Window closed', '');
+        }, 300);
+      }
+
+      toggleMaximizeWindow(window) {
+        if (window.classList.contains('maximized')) {
+          window.classList.remove('maximized');
+          this.showNotification('Window restored', '');
+        } else {
+          window.classList.add('maximized');
+          this.showNotification('Window maximized', '');
+        }
+        this.bringToFront(window);
+      }
+
+      // Drag functionality methods
+      startDrag(e, window) {
+        e.preventDefault();
+        this.dragData.isDragging = true;
+        this.dragData.draggedWindow = window;
+        this.dragData.startX = e.clientX;
+        this.dragData.startY = e.clientY;
+        
+        // Get current window position - handle both positioned and transformed windows
+        const computedStyle = getComputedStyle(window);
+        const transform = computedStyle.transform;
+        
+        if (transform && transform !== 'none') {
+          // Window is using transform, extract translate values
+          const matrix = new DOMMatrix(transform);
+          this.dragData.startLeft = matrix.e || 0;
+          this.dragData.startTop = matrix.f || 0;
+        } else {
+          // Window is using left/top positioning
+          const rect = window.getBoundingClientRect();
+          this.dragData.startLeft = rect.left;
+          this.dragData.startTop = rect.top;
+        }
+        
+        // Reset any existing transform to avoid conflicts
+        window.style.left = '';
+        window.style.top = '';
+        
+        // Add dragging class for visual feedback
+        window.classList.add('dragging');
+        document.body.style.cursor = 'move';
+        document.body.style.userSelect = 'none';
+      }
+
+      handleDrag(e) {
+        if (!this.dragData.isDragging || !this.dragData.draggedWindow) return;
+        
+        // Calculate new position
+        const deltaX = e.clientX - this.dragData.startX;
+        const deltaY = e.clientY - this.dragData.startY;
+        
+        const newLeft = this.dragData.startLeft + deltaX;
+        const newTop = this.dragData.startTop + deltaY;
+        
+        // Constrain to viewport (prevent dragging completely off screen)
+        const windowWidth = this.dragData.draggedWindow.offsetWidth;
+        const windowHeight = this.dragData.draggedWindow.offsetHeight;
+        const maxLeft = window.innerWidth - 100; // Keep at least 100px visible
+        const maxTop = window.innerHeight - 50; // Keep at least 50px visible
+        const minLeft = -windowWidth + 100;
+        const minTop = 32; // Below top bar
+        
+        const constrainedLeft = Math.max(minLeft, Math.min(maxLeft, newLeft));
+        const constrainedTop = Math.max(minTop, Math.min(maxTop, newTop));
+        
+        // Use transform instead of left/top for better performance
+        this.dragData.draggedWindow.style.transform = `translate(${constrainedLeft}px, ${constrainedTop}px)`;
+      }
+
+      endDrag() {
+        if (this.dragData.isDragging && this.dragData.draggedWindow) {
+          this.dragData.draggedWindow.classList.remove('dragging');
+        }
+        
+        // Cancel any pending animation frame
+        if (this.animationFrame) {
+          cancelAnimationFrame(this.animationFrame);
+          this.animationFrame = null;
+        }
+        
+        this.dragData.isDragging = false;
+        this.dragData.draggedWindow = null;
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+      }
+
+      // Method to open apps from Finder or other sources
+      openApp(appName) {
+        if (apps[appName]) {
+          this.createWindow(appName, apps[appName].title, apps[appName].content);
+          this.showNotification(`${apps[appName].title} opened`, '');
+        } else {
+          this.showNotification('App not found', `Cannot open ${appName}`);
+        }
+      }
+
+      createWindow(appName, title, content) {
+        const windowId = `window-${++this.windowCounter}`;
+        
+        // Calculate offset for stacking windows
+        const offset = (this.windowCounter - 1) * 30;
+        
+        const windowHTML = `
+          <div class="mac-window" data-window-id="${windowId}" data-app="${appName}" style="top: ${60 + offset}px; left: ${100 + offset}px;">
+            <div class="window-header">
+              <div class="window-controls">
+                <div class="control-button close"></div>
+                <div class="control-button maximize"></div>
+              </div>
+              <div class="window-title">${title}</div>
+            </div>
+            <div class="window-content">
+              ${content}
+            </div>
+          </div>
+        `;
+
+        const desktop = document.querySelector('.desktop');
+        desktop.insertAdjacentHTML('beforeend', windowHTML);
+        
+        const newWindow = desktop.lastElementChild;
+        
+        // Store reference to this for use in setTimeout
+        const self = this;
+        
+        // Show window first, then bring to front
+        setTimeout(() => {
+          newWindow.classList.add('show');
+          self.bringToFront(newWindow);
+        }, 100);
+
+        this.openWindows[windowId] = { app: appName, element: newWindow };
+        this.updateDockIndicators();
+        
+        return newWindow;
+      }
+
+      updateDockIndicators() {
+        const dockItems = document.querySelectorAll('[data-app]');
+        dockItems.forEach(item => {
+          const appName = item.dataset.app;
+          const hasOpenWindow = Object.values(this.openWindows).some(w => w.app === appName);
+          item.classList.toggle('running', hasOpenWindow);
+        });
+      }
+
+      showNotification(title, message, duration = 3000) {
+        const notification = document.createElement('div');
+        notification.innerHTML = `
+          <div style="
+            position: fixed;
+            top: 60px;
+            right: 20px;
+            background: var(--window-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            z-index: 10000;
+            min-width: 250px;
+            animation: slideInRight 0.3s ease;
+            color: var(--text-primary);
+          ">
+            <div style="font-weight: 600; font-size: 14px;">${title}</div>
+            ${message ? `<div style="color: var(--text-secondary); font-size: 12px; margin-top: 4px;">${message}</div>` : ''}
+          </div>
+        `;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+          notification.style.animation = 'slideOutRight 0.3s ease forwards';
+          setTimeout(() => notification.remove(), 300);
+        }, duration);
+      }
+    }
+
+    // App definitions
+    const apps = {
+      finder: {
+        title: 'Finder',
+        content: `
+          <div class="finder-simple">
+            <div class="finder-header">
+              <img src="{% static 'portfolio/images/icons/apps/finder.png' %}" alt="Finder" class="app-icon"> 
+              <h4>Portfolio Files</h4>
+            </div>
+            
+            <div class="finder-grid">
+              <div class="finder-item" onclick="window.desktopManager.openApp('home')">
+                <img src="{% static 'portfolio/images/icons/apps/home.svg' %}" class="finder-file-icon">
+                <div class="finder-file-name">Portfolio Home</div>
+                <div class="finder-file-type">Application</div>
+              </div>
+              
+              <div class="finder-item" onclick="window.desktopManager.openApp('projects')">
+                <img src="{% static 'portfolio/images/icons/apps/projects.svg' %}" class="finder-file-icon">
+                <div class="finder-file-name">My Projects</div>
+                <div class="finder-file-type">Folder</div>
+              </div>
+              
+              <div class="finder-item" onclick="window.desktopManager.openApp('contact')">
+                <img src="{% static 'portfolio/images/icons/apps/contact.svg' %}" class="finder-file-icon">
+                <div class="finder-file-name">Contact Me</div>
+                <div class="finder-file-type">Document</div>
+              </div>
+              
+              <div class="finder-item" onclick="window.open('https://github.com/suchitsharma2004', '_blank')">
+                <img src="{% static 'portfolio/images/icons/apps/projects.svg' %}" class="finder-file-icon">
+                <div class="finder-file-name">GitHub</div>
+                <div class="finder-file-type">Web Link</div>
+              </div>
+              
+              <div class="finder-item" onclick="window.open('https://www.linkedin.com/in/suchit-sharma2004/', '_blank')">
+                <img src="{% static 'portfolio/images/icons/apps/contact.svg' %}" class="finder-file-icon">
+                <div class="finder-file-name">LinkedIn</div>
+                <div class="finder-file-type">Web Link</div>
+              </div>
+            </div>
+            
+            <div class="finder-status">
+              5 items
+            </div>
+          </div>
+        `
+      },
+      home: {
+        title: 'Portfolio Home',
+        content: `
+          <div class="row mb-4">
+            <div class="col-md-5">
+              <div class="profile-section">
+                <div class="profile-image">
+                  <img src="{% static 'portfolio/images/icons/apps/my-pic.jpeg' %}" alt="Profile" class="profile-avatar">
+                </div>
+                <h1 class="profile-name">Suchit Sharma</h1>
+                <p class="profile-title">AI/ML Researcher & Full Stack Developer</p>
+                <p class="profile-description">
+                  Passionate about <strong>Artificial Intelligence</strong> and <strong>Machine Learning</strong>, with active research contributions in multimedia applications. 
+                  Published researcher with expertise in <em>Django backend development</em>, computer vision, and data science.
+                </p>
+                
+                <div class="research-highlight mt-3 mb-4">
+                  <h6>📄 Recent Publication</h6>
+                  <p class="small">
+                    <strong>Multimedia Tools and Applications</strong><br>
+                    <a href="https://link.springer.com/article/10.1007/s11042-025-20772-8" target="_blank" class="publication-link">
+                      View Research Paper →
+                    </a>
+                  </p>
+                </div>
+                
+                <div class="skills-preview mt-4">
+                  <h5>🚀 Technical Expertise</h5>
+                  <div class="skill-tags">
+                    <span class="skill-tag ai-ml">AI/ML</span>
+                    <span class="skill-tag">TensorFlow</span>
+                    <span class="skill-tag">Python</span>
+                    <span class="skill-tag">Django</span>
+                    <span class="skill-tag">Data Science</span>
+                    <span class="skill-tag">OpenCV</span>
+                    <span class="skill-tag">Research</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-7">
+              <div class="resume-section-compact">
+                <h4>📄 My Resume</h4>
+                <div class="resume-container-compact">
+                  <iframe src="{% static 'portfolio/images/icons/apps/resume.pdf' %}" 
+                          type="application/pdf" 
+                          width="100%" 
+                          height="500px"
+                          class="resume-pdf resume-iframe">
+                    <p>Your browser doesn't support PDF viewing. 
+                       <a href="{% static 'portfolio/images/icons/apps/resume.pdf' %}" target="_blank" class="btn btn-primary">
+                         Download Resume PDF
+                       </a>
+                    </p>
+                  </iframe>
+                  <div class="resume-actions-compact">
+                    <a href="{% static 'portfolio/images/icons/apps/resume.pdf' %}" target="_blank" class="btn btn-outline-primary btn-sm">
+                      <img src="{% static 'portfolio/images/icons/system/info.svg' %}" alt="View" class="inline-icon">
+                      View Full
+                    </a>
+                    <a href="{% static 'portfolio/images/icons/apps/resume.pdf' %}" download class="btn btn-primary btn-sm">
+                      <img src="{% static 'portfolio/images/icons/apps/contact.svg' %}" alt="Download" class="inline-icon">
+                      Download
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      projects: {
+        title: 'My Projects',
+        content: `
+          <div class="app-header">
+            <img src="{% static 'portfolio/images/icons/apps/projects.svg' %}" alt="Projects" class="app-icon">
+            <h4 style="color: var(--text-primary);">Featured Projects</h4>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-4">
+              <div class="skill-card clickable-card" onclick="window.open('https://github.com/suchitsharma2004/SignSetu', '_blank')" style="cursor: pointer;">
+                <div class="skill-icon">
+                  <img src="{% static 'portfolio/images/icons/apps/projects.svg' %}" alt="SignSetu" class="skill-svg">
+                </div>
+                <h5 style="color: var(--text-primary); font-weight: 600;">SignSetu - Indian Sign Language Detection</h5>
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">AI-powered software for ISL-to-text conversion, potentially benefiting 8M+ deaf children in India.</p>
+                <div class="d-flex gap-1 mb-2 flex-wrap justify-content-center">
+                  <span class="badge bg-warning text-dark">Python</span>
+                  <span class="badge bg-info">MediaPipe</span>
+                  <span class="badge bg-primary">OpenCV</span>
+                </div>
+                <small style="color: var(--text-secondary); font-style: italic;">Click to view on GitHub</small>
+              </div>
+            </div>
+            <div class="col-md-6 mb-4">
+              <div class="skill-card clickable-card" onclick="window.open('https://github.com/suchitsharma2004/DermDetect', '_blank')" style="cursor: pointer;">
+                <div class="skill-icon">
+                  <img src="{% static 'portfolio/images/icons/apps/contact.svg' %}" alt="DermDetect" class="skill-svg">
+                </div>
+                <h5 style="color: var(--text-primary); font-weight: 600;">DermDetect - Skin Disease Detection</h5>
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">Web platform with 97% accuracy in skin disease detection using advanced ML algorithms.</p>
+                <div class="d-flex gap-1 mb-2 flex-wrap justify-content-center">
+                  <span class="badge bg-warning text-dark">Python</span>
+                  <span class="badge bg-danger">TensorFlow</span>
+                  <span class="badge bg-primary">OpenCV</span>
+                </div>
+                <small style="color: var(--text-secondary); font-style: italic;">Click to view on GitHub</small>
+              </div>
+            </div>
+            <div class="col-md-6 mb-4">
+              <div class="skill-card clickable-card" onclick="window.open('https://github.com/suchitsharma2004/ChatApp', '_blank')" style="cursor: pointer;">
+                <div class="skill-icon">
+                  <img src="{% static 'portfolio/images/icons/apps/projects.svg' %}" alt="ChatApp" class="skill-svg">
+                </div>
+                <h5 style="color: var(--text-primary); font-weight: 600;">ChatApp - AI-Integrated Chat System</h5>
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">AI-powered chat and mail management system with LLaMA 3.2 integration for enhanced communication.</p>
+                <div class="d-flex gap-1 mb-2 flex-wrap justify-content-center">
+                  <span class="badge bg-success">Django</span>
+                  <span class="badge bg-info">Streamlit</span>
+                  <span class="badge bg-danger">LLaMA 3.2</span>
+                </div>
+                <small style="color: var(--text-secondary); font-style: italic;">Click to view on GitHub</small>
+              </div>
+            </div>
+            <div class="col-md-6 mb-4">
+              <div class="skill-card clickable-card" onclick="window.open('https://github.com/suchitsharma2004/My_portfolio', '_blank')" style="cursor: pointer;">
+                <div class="skill-icon">
+                  <img src="{% static 'portfolio/images/icons/apps/projects.svg' %}" alt="Portfolio" class="skill-svg">
+                </div>
+                <h5 style="color: var(--text-primary); font-weight: 600;">macOS Portfolio Website</h5>
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">Interactive portfolio with authentic macOS interface design and AI-powered terminal assistant.</p>
+                <div class="d-flex gap-1 mb-2 flex-wrap justify-content-center">
+                  <span class="badge bg-success">Django</span>
+                  <span class="badge bg-primary">JavaScript</span>
+                  <span class="badge bg-info">CSS3</span>
+                </div>
+                <small style="color: var(--text-secondary); font-style: italic;">Click to view on GitHub</small>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      contact: {
+        title: 'Contact Me',
+        content: `
+          <div class="app-header">
+            <img src="{% static 'portfolio/images/icons/apps/contact.svg' %}" alt="Contact" class="app-icon">
+            <h4>Get In Touch</h4>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <p>I'm always open to discussing new opportunities!</p>
+              <div class="contact-info">
+                <div class="contact-item">
+                  <img src="{% static 'portfolio/images/icons/apps/contact.svg' %}" alt="Email" class="inline-icon">
+                  <strong>Email:</strong> suchit.sharma.delhi@gmail.com
+                </div>
+                <div class="contact-item">
+                  <img src="{% static 'portfolio/images/icons/apps/phone.png' %}" alt="Phone" class="inline-icon">
+                  <strong>Phone:</strong> +91 9311294118
+                </div>
+                <div class="contact-item">
+                  <img src="{% static 'portfolio/images/icons/apps/github.png' %}" alt="GitHub" class="inline-icon">
+                  <strong>GitHub:</strong> <a href="https://github.com/suchitsharma2004" target="_blank">suchitsharma2004</a>
+                </div>
+                <div class="contact-item">
+                  <img src="{% static 'portfolio/images/icons/apps/linkedin.png' %}" alt="LinkedIn" class="inline-icon">
+                  <strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/suchit-sharma2004/" target="_blank">suchit-sharma2004</a>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <form method="post" action="/contact/">
+                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                <div class="mb-3">
+                  <input type="text" class="form-control" name="name" placeholder="Your Name" required>
+                </div>
+                <div class="mb-3">
+                  <input type="email" class="form-control" name="email" placeholder="Your Email" required>
+                </div>
+                <div class="mb-3">
+                  <input type="text" class="form-control" name="subject" placeholder="Subject" required>
+                </div>
+                <div class="mb-3">
+                  <textarea class="form-control" name="message" rows="3" placeholder="Your Message" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Send Message</button>
+              </form>
+              
+              <div id="form-messages" class="mt-3" style="display: none;">
+                <div class="alert" role="alert"></div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      terminal: {
+        title: 'Terminal',
+        content: `
+          <div id="terminal-container" style="background: #000; color: #00ff00; padding: 20px; border-radius: 8px; font-family: monospace; height: 400px; overflow-y: auto;">
+            <div>Last login: ${new Date().toLocaleString()}</div>
+            <div>suchit@portfolio ~ %</div>
+            <br>
+            <div style="color: #fff;">Welcome to Suchit's AI-Powered Terminal!</div>
+            <div style="color: #ccc;">This terminal is powered by Mistral 7B AI assistant.</div>
+            <div style="color: #ccc;">Ask me anything about Suchit Sharma or his work!</div>
+            <br>
+            <div id="terminal-output"></div>
+            <div id="terminal-input-line" style="display: flex; align-items: center;">
+              <span style="color: #00ff00;">suchit@portfolio ~ % </span>
+              <input type="text" id="terminal-input" style="background: transparent; border: none; outline: none; color: #00ff00; font-family: monospace; flex: 1; margin-left: 5px;" placeholder="Type your message here..." />
+            </div>
+          </div>
+          <style>
+            @keyframes blink { 50% { opacity: 0; } }
+            #terminal-input::placeholder { color: #666; }
+            #terminal-container { position: relative; }
+            .terminal-loading {
+              color: #ccc;
+              animation: blink 1s infinite;
+            }
+          </style>
+        `
+      }
+    };
+
+    // Global functions for UI interactions
+    function toggleSystemMenu() {
+      const menu = document.getElementById('systemMenu');
+      menu.classList.toggle('show');
+    }
+
+    function openApp(appName) {
+      const app = apps[appName];
+      if (app) {
+        window.desktopManager.createWindow(appName, app.title, app.content);
+        window.desktopManager.showNotification(`${app.title} opened`, '');
+        
+        // Special handling for terminal app
+        if (appName === 'terminal') {
+          setTimeout(() => setupTerminal(), 100); // Small delay to ensure DOM is ready
+        }
+      }
+    }
+
+    // Terminal functionality
+    function setupTerminal() {
+      const terminalInput = document.getElementById('terminal-input');
+      const terminalOutput = document.getElementById('terminal-output');
+      
+      if (!terminalInput || !terminalOutput) {
+        console.log('Terminal elements not found, retrying...');
+        setTimeout(() => setupTerminal(), 200);
+        return;
+      }
+      
+      // Focus on the input
+      terminalInput.focus();
+      
+      // Handle Enter key
+      terminalInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          const message = terminalInput.value.trim();
+          if (message) {
+            // Display user message
+            addTerminalLine(`suchit@portfolio ~ % ${message}`, '#00ff00');
+            
+            // Clear input
+            terminalInput.value = '';
+            
+            // Handle built-in commands first
+            if (handleBuiltInCommands(message)) {
+              return;
+            }
+            
+            // Show loading indicator
+            const loadingId = addTerminalLine('AI is thinking...', '#ccc', 'terminal-loading');
+            
+            // Send to LLM
+            sendToLLM(message, loadingId);
+          }
+        }
+      });
+      
+      // Show initial help
+      addTerminalLine('💡 Try asking: "What are Suchit\'s skills?" or "Tell me about his projects"', '#ccc');
+      addTerminalLine('📱 Built-in commands: clear, help, skills, projects', '#666');
+    }
+    
+    function addTerminalLine(text, color = '#00ff00', className = '') {
+      const terminalOutput = document.getElementById('terminal-output');
+      if (!terminalOutput) return null;
+      
+      const line = document.createElement('div');
+      line.style.color = color;
+      line.style.marginBottom = '5px';
+      if (className) line.className = className;
+      line.textContent = text;
+      
+      terminalOutput.appendChild(line);
+      
+      // Scroll to bottom
+      const container = document.getElementById('terminal-container');
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+      }
+      
+      return line;
+    }
+    
+    function handleBuiltInCommands(command) {
+      const cmd = command.toLowerCase().trim();
+      
+      switch(cmd) {
+        case 'clear':
+          document.getElementById('terminal-output').innerHTML = '';
+          return true;
+          
+        case 'help':
+          addTerminalLine('Available commands:', '#fff');
+          addTerminalLine('  clear    - Clear the terminal', '#ccc');
+          addTerminalLine('  help     - Show this help', '#ccc');
+          addTerminalLine('  skills   - Show technical skills', '#ccc');
+          addTerminalLine('  projects - Show featured projects', '#ccc');
+          addTerminalLine('', '#ccc');
+          addTerminalLine('💬 Or ask me anything about Suchit! I\'m powered by AI.', '#0ff');
+          return true;
+          
+        case 'skills':
+          addTerminalLine('🛠️ Technical Skills:', '#fff');
+          addTerminalLine('• Languages: Python, JavaScript, TypeScript, Java', '#ccc');
+          addTerminalLine('• Frontend: React, Vue.js, HTML5, CSS3, Bootstrap', '#ccc');
+          addTerminalLine('• Backend: Django, Node.js, Express.js', '#ccc');
+          addTerminalLine('• Database: PostgreSQL, MySQL, MongoDB', '#ccc');
+          addTerminalLine('• AI/ML: TensorFlow, PyTorch, Scikit-learn', '#ccc');
+          addTerminalLine('• Cloud: AWS, Docker, Kubernetes', '#ccc');
+          addTerminalLine('• Tools: Git, VS Code, Figma', '#ccc');
+          return true;
+          
+        case 'projects':
+          addTerminalLine('🚀 Featured Projects:', '#fff');
+          addTerminalLine('• SignSetu - AI-powered Indian Sign Language detection system', '#ccc');
+          addTerminalLine('• DermDetect - Skin disease detection with 97% ML accuracy', '#ccc');
+          addTerminalLine('• ChatApp - AI-integrated chat system with LLaMA 3.2', '#ccc');
+          addTerminalLine('• macOS Portfolio - This interactive web experience', '#ccc');
+          addTerminalLine('', '#ccc');
+          addTerminalLine('💡 Ask me for more details about any project!', '#0ff');
+          return true;
+          
+        default:
+          return false;
+      }
+    }
+    
+    async function sendToLLM(message, loadingElement) {
+      try {
+        const response = await fetch('/api/llm-chat/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ message: message })
+        });
+        
+        // Remove loading indicator
+        if (loadingElement && loadingElement.parentNode) {
+          loadingElement.parentNode.removeChild(loadingElement);
+        }
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.error) {
+          addTerminalLine(`❌ Error: ${data.error}`, '#ff6b6b');
+        } else {
+          // Display AI response with typing effect
+          displayTypingResponse(data.response);
+        }
+        
+      } catch (error) {
+        console.error('Error calling LLM:', error);
+        // Remove loading indicator
+        if (loadingElement && loadingElement.parentNode) {
+          loadingElement.parentNode.removeChild(loadingElement);
+        }
+        addTerminalLine('❌ Connection error. Make sure the server is running.', '#ff6b6b');
+      }
+    }
+    
+    function displayTypingResponse(text) {
+      const responseElement = addTerminalLine('', '#0ff');
+      let i = 0;
+      
+      function typeWriter() {
+        if (i < text.length) {
+          responseElement.textContent += text.charAt(i);
+          i++;
+          
+          // Scroll to bottom as we type
+          const container = document.getElementById('terminal-container');
+          if (container) {
+            container.scrollTop = container.scrollHeight;
+          }
+          
+          setTimeout(typeWriter, 20); // Adjust typing speed here
+        }
+      }
+      
+      typeWriter();
+    }
+
+    function openAboutWindow() {
+      const aboutContent = `
+        <div class="text-center">
+          <h3>💻 Suchit's macOS Portfolio</h3>
+          <p>Version 1.0.0</p>
+          <p>Built with Django & modern web technologies</p>
+          <p style="font-size: 12px; color: var(--text-secondary);">
+            Processor: M1 Pro Simulation<br>
+            Memory: Unlimited Creative Ideas<br>
+            Graphics: CSS3 & JavaScript Magic
+          </p>
+        </div>
+      `;
+      window.desktopManager.createWindow('about-mac', 'About This Mac', aboutContent);
+      document.getElementById('systemMenu').classList.remove('show');
+    }
+
+    function changeWallpaper() {
+      if (window.wallpaperManager) {
+        const newWallpaper = window.wallpaperManager.nextWallpaper();
+        const wallpaperName = newWallpaper.split('/').pop().replace(/\.[^/.]+$/, ""); // Get filename without extension
+        
+        window.desktopManager.showNotification('Wallpaper changed', `Now using: ${wallpaperName}`);
+        document.getElementById('systemMenu').classList.remove('show');
+      }
+    }
+
+    function showSystemPreferences() {
+      const wallpapers = window.wallpaperManager ? window.wallpaperManager.getAllWallpapers() : [];
+      const wallpaperList = wallpapers.map((wp, index) => {
+        const name = wp.split('/').pop().replace(/\.[^/.]+$/, "").replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        return `<button class="btn btn-outline-light btn-sm mb-2" onclick="setSpecificWallpaper(${index})" style="text-align: left; font-size: 0.75rem;">
+                  <span class="d-block">${name}</span>
+                </button>`;
+      }).join('');
+      
+      const prefsContent = `
+        <div class="system-preferences-header d-flex align-items-center mb-4">
+          <img src="{% static 'portfolio/images/icons/system/settings.svg' %}" width="32" height="32" class="me-3" style="filter: brightness(0) invert(1);">
+          <h4 class="m-0">System Preferences</h4>
+        </div>
+        
+        <div class="row g-4">
+          <div class="col-lg-6">
+            <div class="preference-section p-3 rounded-3 bg-dark bg-opacity-25">
+              <div class="d-flex align-items-center mb-3">
+                <img src="{% static 'portfolio/images/icons/system/theme.svg' %}" width="20" height="20" class="me-2" style="filter: brightness(0) invert(1);">
+                <h6 class="m-0">Appearance</h6>
+              </div>
+              <p class="small mb-3" style="color: var(--text-secondary);">Customize your desktop appearance and theme settings</p>
+              <div class="theme-info p-2 rounded-2 bg-dark bg-opacity-50 mb-3">
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="small" style="color: var(--text-primary);">Current Theme:</span>
+                  <span class="badge bg-primary" id="currentTheme">${document.documentElement.getAttribute('data-theme')}</span>
+                </div>
+              </div>
+              <p class="small mb-2" style="color: var(--text-primary);">Use Control Center (top-right) to toggle between light and dark themes</p>
+            </div>
+          </div>
+          
+          <div class="col-lg-6">
+            <div class="preference-section p-3 rounded-3 bg-dark bg-opacity-25">
+              <div class="d-flex align-items-center mb-3">
+                <img src="{% static 'portfolio/images/icons/system/wallpaper.svg' %}" width="20" height="20" class="me-2" style="filter: brightness(0) invert(1);">
+                <h6 class="m-0">Wallpaper</h6>
+              </div>
+              <p class="small mb-3" style="color: var(--text-secondary);">Choose from available desktop backgrounds</p>
+              <button class="btn btn-primary btn-sm mb-3 w-100" onclick="changeWallpaper()">
+                <i class="me-2">🔄</i>Next Wallpaper
+              </button>
+              
+              <h6 class="small mb-2">Available Wallpapers (${wallpapers.length})</h6>
+              <div class="wallpaper-grid">
+                ${wallpaperList}
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row g-4 mt-3">
+          <div class="col-lg-6">
+            <div class="preference-section p-3 rounded-3 bg-dark bg-opacity-25">
+              <div class="d-flex align-items-center mb-3">
+                <img src="{% static 'portfolio/images/icons/system/info.svg' %}" width="20" height="20" class="me-2" style="filter: brightness(0) invert(1);">
+                <h6 class="m-0">Display Information</h6>
+              </div>
+              <div class="info-grid">
+                <div class="info-item d-flex justify-content-between py-2 border-bottom border-secondary border-opacity-25">
+                  <span class="small" style="color: var(--text-primary);">Screen Resolution:</span>
+                  <span class="small" style="color: var(--text-secondary);">${window.screen.width} × ${window.screen.height}</span>
+                </div>
+                <div class="info-item d-flex justify-content-between py-2 border-bottom border-secondary border-opacity-25">
+                  <span class="small" style="color: var(--text-primary);">Color Depth:</span>
+                  <span class="small" style="color: var(--text-secondary);">${window.screen.colorDepth}-bit</span>
+                </div>
+                <div class="info-item d-flex justify-content-between py-2">
+                  <span class="small" style="color: var(--text-primary);">Available Wallpapers:</span>
+                  <span class="small" style="color: var(--text-secondary);">${wallpapers.length} items</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-lg-6">
+            <div class="preference-section p-3 rounded-3 bg-dark bg-opacity-25">
+              <div class="d-flex align-items-center mb-3">
+                <img src="{% static 'portfolio/images/icons/system/windows.svg' %}" width="20" height="20" class="me-2" style="filter: brightness(0) invert(1);">
+                <h6 class="m-0">Window Management</h6>
+              </div>
+              <p class="small mb-3" style="color: var(--text-secondary);">Manage and organize your desktop windows</p>
+              <div class="d-grid gap-2">
+                <button class="btn btn-outline-light btn-sm" onclick="showAllWindows()">
+                  Show All Windows
+                </button>
+                <button class="btn btn-outline-danger btn-sm" onclick="closeAllWindows()">
+                  Close All Windows
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-4 p-3 rounded-3 bg-dark bg-opacity-25">
+          <div class="d-flex align-items-center">
+            <img src="{% static 'portfolio/images/icons/system/info.svg' %}" width="16" height="16" class="me-2" style="filter: brightness(0) invert(1);">
+            <small style="color: var(--text-secondary);">Tip: Add more wallpapers to the wallpapers folder to expand your collection!</small>
+          </div>
+        </div>
+      `;
+      window.desktopManager.createWindow('preferences', 'System Preferences', prefsContent);
+      
+      // Set up theme update listener for this preferences window
+      setTimeout(() => {
+        const prefsWindow = document.querySelector('.mac-window[data-window-id="preferences"]');
+        if (prefsWindow) {
+          // Add a custom attribute to track this window
+          prefsWindow.setAttribute('data-preferences-window', 'true');
+          // Update theme display immediately
+          themeManager.updateThemeDisplay();
+        }
+      }, 100);
+      
+      document.getElementById('systemMenu').classList.remove('show');
+    }
+
+    function setSpecificWallpaper(index) {
+      if (window.wallpaperManager) {
+        const wallpapers = window.wallpaperManager.getAllWallpapers();
+        if (wallpapers[index]) {
+          window.wallpaperManager.setWallpaper(wallpapers[index]);
+          const wallpaperName = wallpapers[index].split('/').pop().replace(/\.[^/.]+$/, "");
+          window.desktopManager.showNotification('Wallpaper set', `Changed to: ${wallpaperName}`);
+        }
+      }
+    }
+
+    function closeAllWindows() {
+      const windows = document.querySelectorAll('.mac-window:not(.closed)');
+      windows.forEach(window => {
+        window.querySelector('.control-button.close').click();
+      });
+      document.getElementById('systemMenu').classList.remove('show');
+    }
+
+    function showAllWindows() {
+      // Bring all windows to view and arrange them
+      const windows = document.querySelectorAll('.mac-window:not(.closed)');
+      windows.forEach((windowElement, index) => {
+        windowElement.style.display = 'block';
+        windowElement.classList.remove('maximized');
+        // Arrange windows in a cascade
+        const offset = index * 40;
+        windowElement.style.top = `${80 + offset}px`;
+        windowElement.style.left = `${120 + offset}px`;
+        window.desktopManager.bringToFront(windowElement);
+      });
+      document.getElementById('systemMenu').classList.remove('show');
+    }
+
+    function openTrash() {
+      const trashContent = `
+        <h4>🗑️ Trash</h4>
+        <p>The trash is empty.</p>
+        <p class="text-muted small">Items you delete are moved to the Trash. To permanently delete items, empty the Trash.</p>
+        <button class="btn btn-outline-danger btn-sm">Empty Trash</button>
+      `;
+      window.desktopManager.createWindow('trash', 'Trash', trashContent);
+    }
+
+    // Animation styles
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideInRight {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      
+      @keyframes slideOutRight {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Initialize desktop manager when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      window.desktopManager = new DesktopManager();
+      
+      // Handle loading screen
+      setTimeout(() => {
+        const loadingScreen = document.getElementById('loadingScreen');
+        const desktopContent = document.getElementById('desktopContent');
+        
+        // Fade out loading screen
+        loadingScreen.style.opacity = '0';
+        loadingScreen.style.transition = 'opacity 0.5s ease';
+        
+        // Show desktop content
+        setTimeout(() => {
+          loadingScreen.style.display = 'none';
+          desktopContent.style.display = 'block';
+          desktopContent.style.opacity = '0';
+          desktopContent.style.transition = 'opacity 0.5s ease';
+          
+          // Fade in desktop
+          setTimeout(() => {
+            desktopContent.style.opacity = '1';
+          }, 50);
+        }, 500);
+      }, 3000); // 3 second delay
+    });
+  </script>
+
+  </div> <!-- End desktop-content -->
+
+</body>
+</html>

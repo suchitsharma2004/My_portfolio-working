@@ -1,0 +1,705 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}macOS Desktop{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'portfolio/css/styles.css' %}">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script>
+    // Wallpaper Manager
+    class WallpaperManager {
+      constructor() {
+        // Available wallpapers in your folder
+        // Add more wallpapers here when you add them to the folder
+        this.availableWallpapers = [
+          '{% static "portfolio/images/wallpapers/wallpaper1-dark.jpg" %}',
+          '{% static "portfolio/images/wallpapers/wallpaper1-light.jpg" %}',
+          '{% static "portfolio/images/wallpapers/wallpaper2-light.jpg" %}'
+          // When you add more wallpapers, add them like this:
+          // ,'{% static "portfolio/images/wallpapers/your-new-wallpaper.jpg" %}'
+        ];
+        this.currentWallpaperIndex = 0;
+        this.init();
+      }
+      
+      init() {
+        // Load saved wallpaper or use default
+        const savedWallpaper = localStorage.getItem('currentWallpaper');
+        if (savedWallpaper && this.availableWallpapers.includes(savedWallpaper)) {
+          this.setWallpaper(savedWallpaper);
+        } else {
+          // Use the first wallpaper as default
+          this.setWallpaper(this.availableWallpapers[0]);
+        }
+      }
+      
+      setWallpaper(wallpaperUrl) {
+        document.documentElement.style.setProperty('--wallpaper-url', `url("${wallpaperUrl}")`);
+        localStorage.setItem('currentWallpaper', wallpaperUrl);
+        
+        // Update current index
+        this.currentWallpaperIndex = this.availableWallpapers.indexOf(wallpaperUrl);
+        if (this.currentWallpaperIndex === -1) this.currentWallpaperIndex = 0;
+      }
+      
+      nextWallpaper() {
+        this.currentWallpaperIndex = (this.currentWallpaperIndex + 1) % this.availableWallpapers.length;
+        const nextWallpaper = this.availableWallpapers[this.currentWallpaperIndex];
+        this.setWallpaper(nextWallpaper);
+        return nextWallpaper;
+      }
+      
+      getAllWallpapers() {
+        return this.availableWallpapers;
+      }
+    }
+
+    // Theme management
+    const themeManager = {
+      init() {
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        this.setTheme(savedTheme);
+      },
+      
+      setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+      },
+      
+      toggle() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        this.setTheme(newTheme);
+        return newTheme;
+      }
+    };
+
+    // Update time every second
+    function updateTime() {
+      const now = new Date();
+      const time = now.toLocaleTimeString('en-US', { 
+        hour12: false, 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      });
+      const date = now.toLocaleDateString('en-US', { 
+        weekday: 'short', 
+        month: 'short', 
+        day: 'numeric' 
+      });
+      document.querySelector('.right-status').innerHTML = `📶 🔋 ${date} ${time}`;
+    }
+    setInterval(updateTime, 1000);
+
+    // Initialize managers on page load
+    let wallpaperManager;
+    document.addEventListener('DOMContentLoaded', function() {
+      themeManager.init();
+      wallpaperManager = new WallpaperManager();
+      window.wallpaperManager = wallpaperManager; // Make it globally accessible
+    });
+  </script>
+</head>
+<body>
+
+  <!-- macOS-style Top Bar -->
+  <div class="top-bar d-flex justify-content-between align-items-center px-3 py-2">
+    <div class="d-flex align-items-center">
+      <div class="left-controls">🔴 🟡 🟢</div>
+      
+      <!-- System Menu -->
+      <div class="system-menu">
+        <button class="menu-button" onclick="toggleSystemMenu()">
+          <img src="{% static 'portfolio/images/icons/apple/apple-logo-white.png' %}" 
+               alt="Apple" 
+               class="apple-logo"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+          <span style="display: none;">🍎</span>
+        </button>
+        <div class="menu-dropdown" id="systemMenu">
+          <div class="menu-item" onclick="openAboutWindow()">
+            <span>ℹ️</span>
+            <span>About This Mac</span>
+          </div>
+          <div class="menu-item separator"></div>
+          <div class="menu-item" onclick="themeManager.toggle()">
+            <span>🌓</span>
+            <span>Toggle Dark Mode</span>
+          </div>
+          <div class="menu-item" onclick="changeWallpaper()">
+            <span>🖼️</span>
+            <span>Change Wallpaper</span>
+          </div>
+          <div class="menu-item" onclick="showSystemPreferences()">
+            <span>⚙️</span>
+            <span>System Preferences</span>
+          </div>
+          <div class="menu-item separator"></div>
+          <div class="menu-item" onclick="closeAllWindows()">
+            <span>❌</span>
+            <span>Close All Windows</span>
+          </div>
+          <div class="menu-item" onclick="showAllWindows()">
+            <span>📱</span>
+            <span>Show All Windows</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="center-title">Suchit's macOS Desktop</div>
+    <div class="right-status">📶 🔋 20:45</div>
+  </div>
+
+  <!-- Desktop Area -->
+  <div class="desktop">
+    {% block content %}
+    <!-- Default empty desktop - windows will be loaded by JavaScript -->
+    {% endblock %}
+  </div>
+
+  <!-- macOS Dock -->
+  <div class="dock">
+    <div class="dock-item" data-app="finder" onclick="openApp('finder')" title="Finder">
+      <img src="{% static 'portfolio/images/icons/apps/home.png' %}" 
+           alt="Finder" 
+           class="dock-icon"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+      <span class="emoji-fallback" style="display: none;">📁</span>
+    </div>
+    <div class="dock-item" data-app="home" onclick="openApp('home')" title="Portfolio Home">
+      <img src="{% static 'portfolio/images/icons/apps/home.png' %}" 
+           alt="Home" 
+           class="dock-icon"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+      <span class="emoji-fallback" style="display: none;">🏠</span>
+    </div>
+    <div class="dock-item" data-app="about" onclick="openApp('about')" title="About Me">
+      <img src="{% static 'portfolio/images/icons/apps/about.png' %}" 
+           alt="About" 
+           class="dock-icon"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+      <span class="emoji-fallback" style="display: none;">👨‍💻</span>
+    </div>
+    <div class="dock-item" data-app="projects" onclick="openApp('projects')" title="My Projects">
+      <img src="{% static 'portfolio/images/icons/apps/projects.png' %}" 
+           alt="Projects" 
+           class="dock-icon"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+      <span class="emoji-fallback" style="display: none;">💼</span>
+    </div>
+    <div class="dock-item" data-app="contact" onclick="openApp('contact')" title="Contact">
+      <img src="{% static 'portfolio/images/icons/apps/contact.png' %}" 
+           alt="Contact" 
+           class="dock-icon"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+      <span class="emoji-fallback" style="display: none;">📧</span>
+    </div>
+    <div class="dock-item" data-app="terminal" onclick="openApp('terminal')" title="Terminal">
+      <img src="{% static 'portfolio/images/icons/apps/terminal.png' %}" 
+           alt="Terminal" 
+           class="dock-icon"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+      <span class="emoji-fallback" style="display: none;">💻</span>
+    </div>
+    <div class="dock-item" onclick="openTrash()" title="Trash">
+      <img src="{% static 'portfolio/images/icons/apps/trash-empty.png' %}" 
+           alt="Trash" 
+           class="dock-icon"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+      <span class="emoji-fallback" style="display: none;">🗑️</span>
+    </div>
+  </div>
+
+  <script>
+    // Desktop App Manager
+    class DesktopManager {
+      constructor() {
+        this.openWindows = {};
+        this.minimizedWindows = [];
+        this.windowCounter = 0;
+        this.init();
+      }
+
+      init() {
+        updateTime();
+        this.setupEventListeners();
+      }
+
+      setupEventListeners() {
+        // Window control buttons
+        document.addEventListener('click', (e) => {
+          if (e.target.classList.contains('control-button')) {
+            const window = e.target.closest('.mac-window');
+            const buttonType = this.getButtonType(e.target);
+            this.handleWindowControl(window, buttonType);
+          }
+        });
+
+        // Minimized window previews
+        document.addEventListener('click', (e) => {
+          if (e.target.classList.contains('minimized-window-preview')) {
+            this.restoreWindow(e.target.dataset.windowId);
+          }
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+          if (!e.target.closest('.system-menu')) {
+            document.getElementById('systemMenu').classList.remove('show');
+          }
+        });
+      }
+
+      getButtonType(button) {
+        if (button.classList.contains('close')) return 'close';
+        if (button.classList.contains('minimize')) return 'minimize';
+        if (button.classList.contains('maximize')) return 'maximize';
+        return null;
+      }
+
+      handleWindowControl(window, action) {
+        const windowId = window.dataset.windowId || `window-${++this.windowCounter}`;
+        window.dataset.windowId = windowId;
+
+        switch (action) {
+          case 'close':
+            this.closeWindow(window, windowId);
+            break;
+          case 'minimize':
+            this.minimizeWindow(window, windowId);
+            break;
+          case 'maximize':
+            this.toggleMaximizeWindow(window);
+            break;
+        }
+      }
+
+      closeWindow(window, windowId) {
+        window.classList.add('closed');
+        setTimeout(() => {
+          window.remove();
+          delete this.openWindows[windowId];
+          this.updateDockIndicators();
+          this.showNotification('Window closed', '');
+        }, 300);
+      }
+
+      minimizeWindow(window, windowId) {
+        const windowTitle = window.querySelector('.window-title').textContent;
+        window.classList.add('minimized');
+        this.createMinimizedPreview(windowId, windowTitle, window);
+      }
+
+      toggleMaximizeWindow(window) {
+        if (window.classList.contains('maximized')) {
+          window.classList.remove('maximized');
+          this.showNotification('Window restored', '');
+        } else {
+          window.classList.add('maximized');
+          this.showNotification('Window maximized', '');
+        }
+      }
+
+      createMinimizedPreview(windowId, title, windowElement) {
+        const existingPreview = document.querySelector(`[data-window-id="${windowId}"]`);
+        if (existingPreview) existingPreview.remove();
+
+        let container = document.querySelector('.dock-minimized-windows');
+        if (!container) {
+          container = document.createElement('div');
+          container.className = 'dock-minimized-windows';
+          document.body.appendChild(container);
+        }
+
+        const preview = document.createElement('div');
+        preview.className = 'minimized-window-preview';
+        preview.dataset.windowId = windowId;
+        preview.textContent = title;
+        preview.title = `Click to restore ${title}`;
+        
+        container.appendChild(preview);
+        this.minimizedWindows.push({ id: windowId, element: windowElement });
+      }
+
+      restoreWindow(windowId) {
+        const windowData = this.minimizedWindows.find(w => w.id === windowId);
+        if (windowData) {
+          windowData.element.classList.remove('minimized');
+          const preview = document.querySelector(`[data-window-id="${windowId}"]`);
+          if (preview) preview.remove();
+          this.minimizedWindows = this.minimizedWindows.filter(w => w.id !== windowId);
+        }
+      }
+
+      createWindow(appName, title, content) {
+        const windowId = `window-${++this.windowCounter}`;
+        
+        const windowHTML = `
+          <div class="mac-window" data-window-id="${windowId}" data-app="${appName}">
+            <div class="window-header">
+              <div class="window-controls">
+                <div class="control-button close"></div>
+                <div class="control-button minimize"></div>
+                <div class="control-button maximize"></div>
+              </div>
+              <div class="window-title">${title}</div>
+            </div>
+            <div class="window-content">
+              ${content}
+            </div>
+          </div>
+        `;
+
+        const desktop = document.querySelector('.desktop');
+        desktop.insertAdjacentHTML('beforeend', windowHTML);
+        
+        const newWindow = desktop.lastElementChild;
+        setTimeout(() => {
+          newWindow.classList.add('show');
+        }, 100);
+
+        this.openWindows[windowId] = { app: appName, element: newWindow };
+        this.updateDockIndicators();
+        
+        return newWindow;
+      }
+
+      updateDockIndicators() {
+        const dockItems = document.querySelectorAll('[data-app]');
+        dockItems.forEach(item => {
+          const appName = item.dataset.app;
+          const hasOpenWindow = Object.values(this.openWindows).some(w => w.app === appName);
+          item.classList.toggle('running', hasOpenWindow);
+        });
+      }
+
+      showNotification(title, message, duration = 3000) {
+        const notification = document.createElement('div');
+        notification.innerHTML = `
+          <div style="
+            position: fixed;
+            top: 60px;
+            right: 20px;
+            background: var(--window-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            z-index: 10000;
+            min-width: 250px;
+            animation: slideInRight 0.3s ease;
+            color: var(--text-primary);
+          ">
+            <div style="font-weight: 600; font-size: 14px;">${title}</div>
+            ${message ? `<div style="color: var(--text-secondary); font-size: 12px; margin-top: 4px;">${message}</div>` : ''}
+          </div>
+        `;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+          notification.style.animation = 'slideOutRight 0.3s ease forwards';
+          setTimeout(() => notification.remove(), 300);
+        }, duration);
+      }
+    }
+
+    // App definitions
+    const apps = {
+      finder: {
+        title: 'Finder',
+        content: `
+          <h4>📁 File Browser</h4>
+          <p>Welcome to the file system browser. Here you can navigate through your portfolio files.</p>
+          <div class="mb-3">
+            <strong>Quick Access:</strong>
+            <ul>
+              <li>📄 Documents</li>
+              <li>🖼️ Images</li>
+              <li>💼 Projects</li>
+              <li>📧 Contact Info</li>
+            </ul>
+          </div>
+        `
+      },
+      home: {
+        title: 'Portfolio Home',
+        content: `
+          <div class="profile-section">
+            <div class="profile-image">🚀</div>
+            <h1 class="profile-name">Suchit Sharma</h1>
+            <p class="profile-title">Full Stack Developer & Tech Enthusiast</p>
+            <p>Welcome to my digital workspace. I create innovative solutions and bring ideas to life through code.</p>
+          </div>
+          <div class="row text-center">
+            <div class="col-md-3 mb-3">
+              <div class="skill-card">
+                <div class="skill-icon">💻</div>
+                <h5>Frontend</h5>
+                <p class="text-muted small">React, Vue, HTML/CSS</p>
+              </div>
+            </div>
+            <div class="col-md-3 mb-3">
+              <div class="skill-card">
+                <div class="skill-icon">⚙️</div>
+                <h5>Backend</h5>
+                <p class="text-muted small">Django, Node.js, Python</p>
+              </div>
+            </div>
+            <div class="col-md-3 mb-3">
+              <div class="skill-card">
+                <div class="skill-icon">📱</div>
+                <h5>Mobile</h5>
+                <p class="text-muted small">React Native, Flutter</p>
+              </div>
+            </div>
+            <div class="col-md-3 mb-3">
+              <div class="skill-card">
+                <div class="skill-icon">☁️</div>
+                <h5>Cloud</h5>
+                <p class="text-muted small">AWS, Docker, DevOps</p>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      about: {
+        title: 'About Me',
+        content: `
+          <div class="row">
+            <div class="col-md-4 text-center mb-4">
+              <div class="profile-image">👨‍💻</div>
+              <h3 class="mt-3">Suchit Sharma</h3>
+              <p class="text-muted">Full Stack Developer</p>
+            </div>
+            <div class="col-md-8">
+              <h4>👋 Hello, I'm Suchit!</h4>
+              <p>I'm a passionate full-stack developer with a love for creating innovative web applications.</p>
+              <h5 class="mt-4">🎯 What I Do</h5>
+              <ul>
+                <li>Build responsive web applications</li>
+                <li>Develop mobile apps</li>
+                <li>Design scalable backend systems</li>
+                <li>Create intuitive user interfaces</li>
+              </ul>
+            </div>
+          </div>
+        `
+      },
+      projects: {
+        title: 'My Projects',
+        content: `
+          <h4>🚀 Featured Projects</h4>
+          <div class="row">
+            <div class="col-md-6 mb-4">
+              <div class="skill-card">
+                <div class="skill-icon">🛒</div>
+                <h5>E-Commerce Platform</h5>
+                <p class="text-muted small">Full-stack solution with React and Django</p>
+              </div>
+            </div>
+            <div class="col-md-6 mb-4">
+              <div class="skill-card">
+                <div class="skill-icon">📱</div>
+                <h5>Task Manager App</h5>
+                <p class="text-muted small">Mobile-first task management</p>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      contact: {
+        title: 'Contact Me',
+        content: `
+          <h4>📬 Get In Touch</h4>
+          <div class="row">
+            <div class="col-md-6">
+              <p>I'm always open to discussing new opportunities!</p>
+              <div class="mb-3">
+                <strong>📧 Email:</strong> suchit.sharma@example.com
+              </div>
+              <div class="mb-3">
+                <strong>📱 Phone:</strong> +91 98765 43210
+              </div>
+            </div>
+            <div class="col-md-6">
+              <form>
+                <div class="mb-3">
+                  <input type="text" class="form-control" placeholder="Your Name" required>
+                </div>
+                <div class="mb-3">
+                  <input type="email" class="form-control" placeholder="Your Email" required>
+                </div>
+                <div class="mb-3">
+                  <textarea class="form-control" rows="3" placeholder="Your Message" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Send Message</button>
+              </form>
+            </div>
+          </div>
+        `
+      },
+      terminal: {
+        title: 'Terminal',
+        content: `
+          <div style="background: #000; color: #00ff00; padding: 20px; border-radius: 8px; font-family: monospace;">
+            <div>Last login: ${new Date().toLocaleString()}</div>
+            <div>suchit@portfolio ~ % <span style="animation: blink 1s infinite;">|</span></div>
+            <br>
+            <div style="color: #fff;">Welcome to Suchit's Portfolio Terminal!</div>
+            <div style="color: #ccc;">Type 'help' for available commands</div>
+          </div>
+          <style>
+            @keyframes blink { 50% { opacity: 0; } }
+          </style>
+        `
+      }
+    };
+
+    // Global functions for UI interactions
+    function toggleSystemMenu() {
+      const menu = document.getElementById('systemMenu');
+      menu.classList.toggle('show');
+    }
+
+    function openApp(appName) {
+      const app = apps[appName];
+      if (app) {
+        window.desktopManager.createWindow(appName, app.title, app.content);
+        window.desktopManager.showNotification(`${app.title} opened`, '');
+      }
+    }
+
+    function openAboutWindow() {
+      const aboutContent = `
+        <div class="text-center">
+          <h3>💻 Suchit's macOS Portfolio</h3>
+          <p>Version 1.0.0</p>
+          <p>Built with Django & modern web technologies</p>
+          <p style="font-size: 12px; color: var(--text-secondary);">
+            Processor: M1 Pro Simulation<br>
+            Memory: Unlimited Creative Ideas<br>
+            Graphics: CSS3 & JavaScript Magic
+          </p>
+        </div>
+      `;
+      window.desktopManager.createWindow('about-mac', 'About This Mac', aboutContent);
+      document.getElementById('systemMenu').classList.remove('show');
+    }
+
+    function changeWallpaper() {
+      if (window.wallpaperManager) {
+        const newWallpaper = window.wallpaperManager.nextWallpaper();
+        const wallpaperName = newWallpaper.split('/').pop().replace(/\.[^/.]+$/, ""); // Get filename without extension
+        
+        window.desktopManager.showNotification('Wallpaper changed', `Now using: ${wallpaperName}`);
+        document.getElementById('systemMenu').classList.remove('show');
+      }
+    }
+
+    function showSystemPreferences() {
+      const wallpapers = window.wallpaperManager ? window.wallpaperManager.getAllWallpapers() : [];
+      const wallpaperList = wallpapers.map((wp, index) => {
+        const name = wp.split('/').pop().replace(/\.[^/.]+$/, "");
+        return `<button class="btn btn-outline-secondary btn-sm mb-1 w-100" onclick="setSpecificWallpaper(${index})">${name}</button>`;
+      }).join('');
+      
+      const prefsContent = `
+        <h4>⚙️ System Preferences</h4>
+        <div class="row">
+          <div class="col-md-6">
+            <h6>🎨 Appearance</h6>
+            <button class="btn btn-outline-primary btn-sm mb-2 w-100" onclick="themeManager.toggle(); updateThemeDisplay()">Toggle Theme</button>
+            <button class="btn btn-outline-secondary btn-sm mb-2 w-100" onclick="changeWallpaper()">Next Wallpaper</button>
+            
+            <h6 class="mt-3">🖼️ Available Wallpapers</h6>
+            <div class="d-grid gap-2">
+              ${wallpaperList}
+            </div>
+          </div>
+          <div class="col-md-6">
+            <h6>💻 Display</h6>
+            <p class="small"><strong>Current Theme:</strong> <span id="currentTheme">${document.documentElement.getAttribute('data-theme')}</span></p>
+            <p class="small"><strong>Resolution:</strong> ${window.screen.width}x${window.screen.height}</p>
+            <p class="small"><strong>Wallpapers Available:</strong> ${wallpapers.length}</p>
+            
+            <h6 class="mt-3">ℹ️ Info</h6>
+            <p class="small">Add more wallpapers to the wallpapers folder to see them here!</p>
+          </div>
+        </div>
+      `;
+      window.desktopManager.createWindow('preferences', 'System Preferences', prefsContent);
+      document.getElementById('systemMenu').classList.remove('show');
+    }
+
+    function setSpecificWallpaper(index) {
+      if (window.wallpaperManager) {
+        const wallpapers = window.wallpaperManager.getAllWallpapers();
+        if (wallpapers[index]) {
+          window.wallpaperManager.setWallpaper(wallpapers[index]);
+          const wallpaperName = wallpapers[index].split('/').pop().replace(/\.[^/.]+$/, "");
+          window.desktopManager.showNotification('Wallpaper set', `Changed to: ${wallpaperName}`);
+        }
+      }
+    }
+
+    function updateThemeDisplay() {
+      const themeSpan = document.getElementById('currentTheme');
+      if (themeSpan) {
+        themeSpan.textContent = document.documentElement.getAttribute('data-theme');
+      }
+    }
+
+    function closeAllWindows() {
+      const windows = document.querySelectorAll('.mac-window:not(.closed)');
+      windows.forEach(window => {
+        window.querySelector('.control-button.close').click();
+      });
+      document.getElementById('systemMenu').classList.remove('show');
+    }
+
+    function showAllWindows() {
+      const windows = document.querySelectorAll('.mac-window.minimized');
+      windows.forEach(window => {
+        const windowId = window.dataset.windowId;
+        window.desktopManager.restoreWindow(windowId);
+      });
+      document.getElementById('systemMenu').classList.remove('show');
+    }
+
+    function openTrash() {
+      const trashContent = `
+        <h4>🗑️ Trash</h4>
+        <p>The trash is empty.</p>
+        <p class="text-muted small">Items you delete are moved to the Trash. To permanently delete items, empty the Trash.</p>
+        <button class="btn btn-outline-danger btn-sm">Empty Trash</button>
+      `;
+      window.desktopManager.createWindow('trash', 'Trash', trashContent);
+    }
+
+    // Animation styles
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideInRight {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      
+      @keyframes slideOutRight {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Initialize desktop manager when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      window.desktopManager = new DesktopManager();
+    });
+  </script>
+
+</body>
+</html>
