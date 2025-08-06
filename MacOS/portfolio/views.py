@@ -108,11 +108,11 @@ def get_fallback_response(user_message):
     if any(word in message_lower for word in ['skills', 'skill', 'technical', 'programming', 'languages', 'technology', 'tech']):
         return """Suchit Sharma has strong technical skills in:
 
-🐍 **Programming Languages:** Python, C++, JavaScript
-🛠️ **Frameworks:** Django, React, Node.js
+🐍 **Programming Languages:** Python, C++
+🛠️ **Frameworks:** Django
 🗄️ **Databases:** PostgreSQL, MySQL, MongoDB  
 🤖 **AI/ML:** TensorFlow, OpenCV, Pandas, NumPy
-☁️ **Cloud & Tools:** AWS, Docker, Git, VS Code
+☁️ **Cloud & Tools:** AWS, Git, VS Code
 
 He specializes in full-stack development and AI/ML applications."""
 
