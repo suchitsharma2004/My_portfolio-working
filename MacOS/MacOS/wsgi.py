@@ -11,6 +11,13 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'MacOS.settings')
+# Set the settings module based on environment
+if os.environ.get('VERCEL'):
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'MacOS.production_settings')
+else:
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'MacOS.settings')
 
 application = get_wsgi_application()
+
+# Vercel expects the app to be available as a function
+app = application
