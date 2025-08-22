@@ -116,12 +116,13 @@ def get_fallback_response(user_message):
 
 He specializes in full-stack development and AI/ML applications."""
 
-    elif any(word in message_lower for word in ['projects', 'project', 'work', 'portfolio', 'signsetu', 'dermdetect', 'chatapp']):
+    elif any(word in message_lower for word in ['projects', 'project', 'work', 'portfolio', 'signsetu', 'dermdetect', 'FlowMail'
+    '']):
         return """Suchit has worked on several impactful projects:
 
 🤟 **SignSetu** - Indian Sign Language Detection using Python, MediaPipe, OpenCV
 🏥 **DermDetect** - Skin Disease Detection with 97% accuracy using TensorFlow
-💬 **ChatApp** - AI-Integrated Chat System with LLaMA 3.2
+💬 **FlowMail** - AI-Integrated Chat System with Gemini
 🌐 **Portfolio Website** - This interactive macOS-style interface
 
 Each project demonstrates his expertise in combining AI/ML with practical applications."""
@@ -186,7 +187,7 @@ What would you like to know about Suchit?"""
         return """I'm here to help you learn about Suchit Sharma! Here's what I can tell you about:
 
 🛠️ **Skills:** Programming languages, frameworks, tools
-🚀 **Projects:** SignSetu, DermDetect, ChatApp details
+🚀 **Projects:** SignSetu, DermDetect, FlowMail details
 🎓 **Education:** Bennett University background
 💼 **Experience:** Internship and work history
 🏆 **Achievements:** Awards, publications, leadership
@@ -204,7 +205,7 @@ You can also use built-in terminal commands: `clear`, `skills`, `projects`, `hel
         return f"""I'm Suchit Sharma's AI assistant! While I'd love to help with "{user_message}", I'm specifically designed to share information about Suchit's:
 
 🎯 **Technical Skills** - Programming languages, frameworks, tools
-🚀 **Projects** - SignSetu, DermDetect, ChatApp, and more
+🚀 **Projects** - SignSetu, DermDetect, FlowMail, and more
 🎓 **Education** - CSE at Bennett University
 💼 **Experience** - Backend development internship
 🏆 **Achievements** - Awards, publications, leadership
