@@ -287,48 +287,80 @@ Style:
 - If unsure about a detail, say you don't know and suggest what the user can ask next.
 """.strip()
 
-
 @csrf_exempt
 @require_POST
 def gemini_chat(request):
-    """Chat endpoint powered by Google Gemini.
-
-    IMPORTANT: API key must be provided via environment variable GEMINI_API_KEY.
-    """
     try:
         data = json.loads(request.body)
         user_message = (data.get('message') or '').strip()
+
         if not user_message:
-            return JsonResponse({'error': 'Message cannot be empty'}, status=400)
+            return JsonResponse(
+                {'error': 'Message cannot be empty'},
+                status=400
+            )
 
         api_key = os.getenv('GEMINI_API_KEY')
-        if not api_key:
-            return JsonResponse({'error': 'Server is missing GEMINI_API_KEY'}, status=500)
 
-        try:
-            import google.generativeai as genai
-        except Exception:
+        if not api_key:
             return JsonResponse(
-                {'error': 'Gemini library not installed. Install google-generativeai.'},
-                status=500,
+                {'error': 'Missing GEMINI_API_KEY'},
+                status=500
             )
+
+        import google.generativeai as genai
 
         genai.configure(api_key=api_key)
 
-        model_name = os.getenv('GEMINI_MODEL', 'gemini-1.5-flash')
-        model = genai.GenerativeModel(model_name)
+        # Fallback chain
+        MODELS = [
+            "gemini-2.5-flash",
+            "gemini-1.5-flash",
+            "gemini-1.5-pro",
+        ]
 
-        prompt = f"{_gemini_system_prompt()}\n\nUser: {user_message}"
-        resp = model.generate_content(prompt)
+        last_error = None
 
-        text = (getattr(resp, 'text', None) or '').strip()
-        if not text:
-            text = "I couldn't generate a response right now. Please try again."
+        for model_name in MODELS:
+            try:
+                print(f"Trying model: {model_name}")
 
-        return JsonResponse({'response': text})
+                model = genai.GenerativeModel(
+                    model_name=model_name,
+                    system_instruction=_gemini_system_prompt()
+                )
+
+                response = model.generate_content(user_message)
+
+                text = getattr(response, "text", "").strip()
+
+                if text:
+                    return JsonResponse({
+                        "response": text,
+                        "model_used": model_name
+                    })
+
+            except Exception as e:
+                print(f"{model_name} failed: {e}")
+                last_error = str(e)
+
+                # Continue to next fallback model
+                continue
+
+        return JsonResponse({
+            "error": "All Gemini models failed",
+            "details": last_error
+        }, status=500)
 
     except json.JSONDecodeError:
-        return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+        return JsonResponse(
+            {'error': 'Invalid JSON'},
+            status=400
+        )
+
     except Exception as e:
-        print(f"Gemini chat error: {e}")
-        return JsonResponse({'error': 'Sorry, I encountered an error. Please try again.'}, status=500)
+        print(f"Gemini error: {e}")
+
+        return JsonResponse({
+            'error': 'Internal server error'
+        }, status=500)
