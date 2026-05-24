@@ -156,6 +156,7 @@
              alt="Apple" 
              class="apple-logo"
              onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+        <span style="display: none;">🍎</span>
       </button>
       <div class="menu-dropdown" id="systemMenu">
         <div class="menu-item" onclick="openAboutWindow()">
@@ -650,7 +651,7 @@
             
             <div class="col-md-7">
               <div class="resume-section-compact">
-                <h4>My Resume</h4>
+                <h4>📄 My Resume</h4>
                 <div class="resume-container-compact">
                   <iframe src="{% static 'portfolio/images/icons/apps/resume_1.pdf' %}" 
                           type="application/pdf" 
@@ -894,7 +895,7 @@
       });
       
       // Show initial help
-      addTerminalLine('Try asking: "What are Suchit\'s skills?" or "Tell me about his projects"', '#ccc');
+      addTerminalLine('💡 Try asking: "What are Suchit\'s skills?" or "Tell me about his projects"', '#ccc');
       addTerminalLine('Built-in commands: clear, help, skills, projects', '#666');
     }
     
@@ -934,11 +935,11 @@
           addTerminalLine('  skills   - Show technical skills', '#ccc');
           addTerminalLine('  projects - Show featured projects', '#ccc');
           addTerminalLine('', '#ccc');
-          addTerminalLine('Or ask me anything about Suchit. This terminal is AI-powered.', '#0ff');
+          addTerminalLine('💬 Or ask me anything about Suchit! I\'m powered by AI.', '#0ff');
           return true;
-
+          
         case 'skills':
-          addTerminalLine('Technical Skills:', '#fff');
+          addTerminalLine('🛠️ Technical Skills:', '#fff');
           addTerminalLine('• Languages: Python, C++', '#ccc');
           addTerminalLine('• Backend: Django', '#ccc');
           addTerminalLine('• Database: PostgreSQL, MySQL, MongoDB', '#ccc');
@@ -946,15 +947,15 @@
           addTerminalLine('• Cloud: AWS', '#ccc');
           addTerminalLine('• Tools: Git, VS Code', '#ccc');
           return true;
-
+          
         case 'projects':
-          addTerminalLine('Featured Projects:', '#fff');
+          addTerminalLine('🚀 Featured Projects:', '#fff');
           addTerminalLine('• SignSetu - AI-powered Indian Sign Language detection system', '#ccc');
           addTerminalLine('• DermDetect - Skin disease detection with 97% ML accuracy', '#ccc');
           addTerminalLine('• FlowMail - AI-integrated chat system with Gemini', '#ccc');
-          addTerminalLine('• NeuraRAG - Retrieval-Augmented Generation system', '#ccc');
+          addTerminalLine('• macOS Portfolio - This interactive web experience', '#ccc');
           addTerminalLine('', '#ccc');
-          addTerminalLine('Ask me for more details about any project.', '#0ff');
+          addTerminalLine('💡 Ask me for more details about any project!', '#0ff');
           return true;
           
         default:
@@ -982,9 +983,9 @@
         }
         
         const data = await response.json();
-
+        
         if (data.error) {
-          addTerminalLine(`Error: ${data.error}`, '#ff6b6b');
+          addTerminalLine(`❌ Error: ${data.error}`, '#ff6b6b');
         } else {
           // Display AI response with typing effect
           displayTypingResponse(data.response);
@@ -996,7 +997,7 @@
         if (loadingElement && loadingElement.parentNode) {
           loadingElement.parentNode.removeChild(loadingElement);
         }
-        addTerminalLine('Connection error. Please try again.', '#ff6b6b');
+        addTerminalLine('❌ Connection error. Make sure the server is running.', '#ff6b6b');
       }
     }
     
@@ -1025,7 +1026,7 @@
     function openAboutWindow() {
       const aboutContent = `
         <div class="text-center">
-          <h3>Suchit's macOS Portfolio</h3>
+          <h3>💻 Suchit's macOS Portfolio</h3>
           <p>Version 1.0.0</p>
           <p>Built with Django & modern web technologies</p>
           <p style="font-size: 12px; color: var(--text-secondary);">
@@ -1090,7 +1091,7 @@
               </div>
               <p class="small mb-3" style="color: var(--text-secondary);">Choose from available desktop backgrounds</p>
               <button class="btn btn-primary btn-sm mb-3 w-100" onclick="changeWallpaper()">
-                Next Wallpaper
+                <i class="me-2">🔄</i>Next Wallpaper
               </button>
               
               <h6 class="small mb-2">Available Wallpapers (${wallpapers.length})</h6>
@@ -1203,7 +1204,7 @@
 
     function openTrash() {
       const trashContent = `
-        <h4>Trash</h4>
+        <h4>🗑️ Trash</h4>
         <p>The trash is empty.</p>
         <p class="text-muted small">Items you delete are moved to the Trash. To permanently delete items, empty the Trash.</p>
         <button class="btn btn-outline-danger btn-sm">Empty Trash</button>

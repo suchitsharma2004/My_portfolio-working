@@ -1,7 +1,7 @@
 {
   "builds": [
     {
-      "src": "MacOS/MacOS/wsgi.py",
+      "src": "MacOS/wsgi.py",
       "use": "@vercel/python",
       "config": { "maxLambdaSize": "15mb", "runtime": "python3.9" }
     }
@@ -9,7 +9,7 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "MacOS/MacOS/wsgi.py"
+      "dest": "MacOS/wsgi.py"
     }
   ]
 }
