@@ -11,28 +11,14 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-import os
-
-# Prefer python-decouple, but don't hard-fail on platforms/builds where it's missing.
-try:
-    from decouple import config  # type: ignore
-except Exception:  # pragma: no cover
-    def config(key, default=None, cast=None):
-        val = os.environ.get(key, default)
-        if cast is not None and val is not None:
-            try:
-                return cast(val)
-            except Exception:
-                return default
-        return val
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Explicitly load BASE_DIR/.env into process env (python-decouple doesn't always export to os.environ)
 try:
-    from decouple import Config, RepositoryEnv  # type: ignore
+    from decouple import Config, RepositoryEnv
     _env_path = BASE_DIR / '.env'
     if _env_path.exists():
         _c = Config(RepositoryEnv(str(_env_path)))

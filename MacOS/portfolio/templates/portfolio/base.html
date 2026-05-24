@@ -964,7 +964,7 @@
     
     async function sendToLLM(message, loadingElement) {
       try {
-        const response = await fetch(`${window.location.origin}/api/gemini-chat/`, {
+        const response = await fetch('/api/gemini-chat/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
