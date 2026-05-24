@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_http_methods, require_POST
 from django.core.mail import send_mail, BadHeaderError
 from django.conf import settings
 from django.contrib import messages
@@ -265,3 +265,70 @@ def llm_test(request):
             'error': str(e),
             'status': 'error'
         }, status=500)
+
+def _gemini_system_prompt() -> str:
+    """System prompt grounding Gemini answers to Suchit's portfolio info only."""
+    return """You are an assistant embedded in Suchit Sharma's portfolio website.
+
+Goal:
+- Answer questions about Suchit Sharma (skills, projects, experience, education, contact).
+- If a user asks something unrelated to Suchit, politely steer back to portfolio topics.
+
+Facts to use:
+- Name: Suchit Sharma
+- Role: Python Developer and AI/ML Researcher
+- Certification: Oracle Certified Generative AI Professional
+- Skills: Python, Django, FastAPI, TensorFlow; LLMs & RAG; AI research
+- Projects: NeuraRAG, FlowMail, SignSetu, DermDetect (see portfolio projects section)
+- Contact: email suchit.sharma.delhi@gmail.com; GitHub suchitsharma2004; LinkedIn suchit-sharma2004
+
+Style:
+- Professional, concise, helpful.
+- If unsure about a detail, say you don't know and suggest what the user can ask next.
+""".strip()
+
+
+@csrf_exempt
+@require_POST
+def gemini_chat(request):
+    """Chat endpoint powered by Google Gemini.
+
+    IMPORTANT: API key must be provided via environment variable GEMINI_API_KEY.
+    """
+    try:
+        data = json.loads(request.body)
+        user_message = (data.get('message') or '').strip()
+        if not user_message:
+            return JsonResponse({'error': 'Message cannot be empty'}, status=400)
+
+        api_key = os.getenv('GEMINI_API_KEY')
+        if not api_key:
+            return JsonResponse({'error': 'Server is missing GEMINI_API_KEY'}, status=500)
+
+        try:
+            import google.generativeai as genai
+        except Exception:
+            return JsonResponse(
+                {'error': 'Gemini library not installed. Install google-generativeai.'},
+                status=500,
+            )
+
+        genai.configure(api_key=api_key)
+
+        model_name = os.getenv('GEMINI_MODEL', 'gemini-1.5-flash')
+        model = genai.GenerativeModel(model_name)
+
+        prompt = f"{_gemini_system_prompt()}\n\nUser: {user_message}"
+        resp = model.generate_content(prompt)
+
+        text = (getattr(resp, 'text', None) or '').strip()
+        if not text:
+            text = "I couldn't generate a response right now. Please try again."
+
+        return JsonResponse({'response': text})
+
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+    except Exception as e:
+        print(f"Gemini chat error: {e}")
+        return JsonResponse({'error': 'Sorry, I encountered an error. Please try again.'}, status=500)

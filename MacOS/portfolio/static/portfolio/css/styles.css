@@ -1201,20 +1201,6 @@ img[src*="apple-logo"] {
 }
 
 /* Ensure text is visible in both light and dark modes */
-[data-theme="light"] .preference-section {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-[data-theme="light"] .preference-section h6,
-[data-theme="light"] .info-item span:first-child {
-    color: #333 !important;
-}
-
-[data-theme="light"] .preference-section p,
-[data-theme="light"] .info-item span:last-child {
-    color: #666 !important;
-}
-
 [data-theme="dark"] .preference-section h6,
 [data-theme="dark"] .info-item span:first-child {
     color: #ffffff !important;
