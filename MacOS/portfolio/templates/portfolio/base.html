@@ -939,7 +939,7 @@
           return true;
           
         case 'skills':
-          addTerminalLine('🛠️ Technical Skills:', '#fff');
+          addTerminalLine('Technical Skills:', '#fff');
           addTerminalLine('• Languages: Python, C++', '#ccc');
           addTerminalLine('• Backend: Django', '#ccc');
           addTerminalLine('• Database: PostgreSQL, MySQL, MongoDB', '#ccc');
@@ -949,13 +949,13 @@
           return true;
           
         case 'projects':
-          addTerminalLine('🚀 Featured Projects:', '#fff');
+          addTerminalLine('Featured Projects:', '#fff');
           addTerminalLine('• SignSetu - AI-powered Indian Sign Language detection system', '#ccc');
           addTerminalLine('• DermDetect - Skin disease detection with 97% ML accuracy', '#ccc');
           addTerminalLine('• FlowMail - AI-integrated chat system with Gemini', '#ccc');
-          addTerminalLine('• macOS Portfolio - This interactive web experience', '#ccc');
+          addTerminalLine('• NeuraRAG - Retrieval-Augmented Generation system', '#ccc');
           addTerminalLine('', '#ccc');
-          addTerminalLine('💡 Ask me for more details about any project!', '#0ff');
+          addTerminalLine('Ask me for more details about any project.', '#0ff');
           return true;
           
         default:
@@ -965,39 +965,44 @@
     
     async function sendToLLM(message, loadingElement) {
       try {
-        const response = await fetch('/api/gemini-chat/', {
+        const apiUrl = `${window.location.origin}/api/gemini-chat/`;
+        const response = await fetch(apiUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ message: message })
         });
-        
+
         // Remove loading indicator
         if (loadingElement && loadingElement.parentNode) {
           loadingElement.parentNode.removeChild(loadingElement);
         }
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+
+        let data;
+        try {
+          data = await response.json();
+        } catch (e) {
+          const text = await response.text();
+          throw new Error(`Non-JSON response (status ${response.status}): ${text.slice(0, 300)}`);
         }
-        
-        const data = await response.json();
-        
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${data && (data.error || JSON.stringify(data))}`);
+        }
+
         if (data.error) {
-          addTerminalLine(`❌ Error: ${data.error}`, '#ff6b6b');
+          addTerminalLine(`Error: ${data.error}`, '#ff6b6b');
         } else {
-          // Display AI response with typing effect
           displayTypingResponse(data.response);
         }
-        
+
       } catch (error) {
-        console.error('Error calling LLM:', error);
-        // Remove loading indicator
+        console.error('Error calling Gemini API endpoint:', error);
         if (loadingElement && loadingElement.parentNode) {
           loadingElement.parentNode.removeChild(loadingElement);
         }
-        addTerminalLine('❌ Connection error. Make sure the server is running.', '#ff6b6b');
+        addTerminalLine(`Connection error: ${String(error.message || error)}`, '#ff6b6b');
       }
     }
     
