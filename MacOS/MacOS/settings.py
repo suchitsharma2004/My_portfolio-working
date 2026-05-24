@@ -16,6 +16,28 @@ from decouple import config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Explicitly load BASE_DIR/.env into process env (python-decouple doesn't always export to os.environ)
+try:
+    from decouple import Config, RepositoryEnv
+    _env_path = BASE_DIR / '.env'
+    if _env_path.exists():
+        _c = Config(RepositoryEnv(str(_env_path)))
+        # Export needed keys into os.environ so views using os.getenv() can read them
+        for _k in [
+            'GEMINI_API_KEY',
+            'GEMINI_MODEL_CHAIN',
+            'EMAIL_HOST_PASSWORD',
+            'DEBUG',
+            'SECRET_KEY',
+            'ALLOWED_HOSTS',
+        ]:
+            if _k not in os.environ:
+                v = _c(_k, default=None)
+                if v is not None:
+                    os.environ[_k] = str(v)
+except Exception:
+    pass
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -147,3 +169,7 @@ EMAIL_TIMEOUT = 60
 
 # Contact form settings
 CONTACT_EMAIL = 'suchit.sharma.delhi@gmail.com'  # Where to send contact form emails
+
+# Gemini configuration
+GEMINI_API_KEY = config('GEMINI_API_KEY', default='')
+GEMINI_MODEL_CHAIN = config('GEMINI_MODEL_CHAIN', default='gemini-2.5-flash,gemini-1.5-flash,gemini-1.5-pro')

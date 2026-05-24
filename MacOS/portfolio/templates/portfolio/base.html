@@ -59,7 +59,7 @@
     // Theme management
     const themeManager = {
       init() {
-        const savedTheme = localStorage.getItem('theme') || 'light';
+        const savedTheme = localStorage.getItem('theme') || 'dark';
         this.setTheme(savedTheme);
       },
       
@@ -164,7 +164,7 @@
                alt="Info" 
                class="menu-icon-svg"
                onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
-          <span class="menu-icon" style="display: none;">ℹ️</span>
+          <span class="menu-icon" style="display: none;"></span>
           <span>About This Mac</span>
         </div>
         <div class="menu-item separator"></div>
@@ -173,7 +173,7 @@
                alt="Wallpaper" 
                class="menu-icon-svg"
                onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
-          <span class="menu-icon" style="display: none;">🖼️</span>
+          <span class="menu-icon" style="display: none;"></span>
           <span>Change Wallpaper</span>
         </div>
         <div class="menu-item" onclick="showSystemPreferences()">
@@ -181,7 +181,7 @@
                alt="Settings" 
                class="menu-icon-svg"
                onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
-          <span class="menu-icon" style="display: none;">⚙️</span>
+          <span class="menu-icon" style="display: none;"></span>
           <span>System Preferences</span>
         </div>
         <div class="menu-item separator"></div>
@@ -190,7 +190,7 @@
                alt="Close" 
                class="menu-icon-svg"
                onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
-          <span class="menu-icon" style="display: none;">❌</span>
+          <span class="menu-icon" style="display: none;"></span>
           <span>Close All Windows</span>
         </div>
         <div class="menu-item" onclick="showAllWindows()">
@@ -198,7 +198,7 @@
                alt="Windows" 
                class="menu-icon-svg"
                onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
-          <span class="menu-icon" style="display: none;">📱</span>
+          <span class="menu-icon" style="display: none;"></span>
           <span>Show All Windows</span>
         </div>
       </div>
@@ -212,15 +212,6 @@
            onclick="themeManager.toggle()"
            title="Control Center - Toggle Theme"
            onerror="this.style.display='none';">
-      <img src="{% static 'portfolio/images/icons/apple/wifi-logo-white.svg' %}" 
-           alt="WiFi" 
-           class="status-icon"
-           onerror="this.style.display='none';">
-      <img src="{% static 'portfolio/images/icons/apple/battery-white.svg' %}" 
-           alt="Battery" 
-           class="status-icon"
-           onerror="this.style.display='none';">
-      <span class="battery-fallback" style="display: none;">🔋</span>
       <span class="time-display">Wed Aug 6 <span class="time-separator">|</span> 8:45 PM</span>
     </div>
   </div>
@@ -239,42 +230,35 @@
            alt="Finder" 
            class="dock-icon"
            onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-      <span class="emoji-fallback" style="display: none;">📁</span>
+      <span class="emoji-fallback" style="display: none;"></span>
     </div>
-    <div class="dock-item" data-app="home" onclick="openApp('home')" title="Portfolio Home">
+    <div class="dock-item" data-app="home" onclick="openApp('home')" title="Profile">
       <img src="{% static 'portfolio/images/icons/apps/home.png' %}" 
            alt="Home" 
            class="dock-icon"
            onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-      <span class="emoji-fallback" style="display: none;">🏠</span>
+      <span class="emoji-fallback" style="display: none;"></span>
     </div>
     <div class="dock-item" data-app="projects" onclick="openApp('projects')" title="My Projects">
       <img src="{% static 'portfolio/images/icons/apps/projects.png' %}" 
            alt="Projects" 
            class="dock-icon"
            onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-      <span class="emoji-fallback" style="display: none;">💼</span>
+      <span class="emoji-fallback" style="display: none;"></span>
     </div>
     <div class="dock-item" data-app="contact" onclick="openApp('contact')" title="Contact">
-      <img src="{% static 'portfolio/images/icons/apps/contact.svg' %}" 
+      <img src="{% static 'portfolio/images/icons/apps/contact.png' %}" 
            alt="Contact" 
            class="dock-icon"
            onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-      <span class="emoji-fallback" style="display: none;">📧</span>
+      <span class="emoji-fallback" style="display: none;"></span>
     </div>
     <div class="dock-item" data-app="terminal" onclick="openApp('terminal')" title="Terminal">
       <img src="{% static 'portfolio/images/icons/apps/terminal.png' %}" 
            alt="Terminal" 
            class="dock-icon"
            onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-      <span class="emoji-fallback" style="display: none;">💻</span>
-    </div>
-    <div class="dock-item" onclick="openTrash()" title="Trash">
-      <img src="{% static 'portfolio/images/icons/apps/trash-empty.png' %}" 
-           alt="Trash" 
-           class="dock-icon"
-           onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-      <span class="emoji-fallback" style="display: none;">🗑️</span>
+      <span class="emoji-fallback" style="display: none;"></span>
     </div>
   </div>
 
@@ -589,7 +573,7 @@
             <div class="finder-grid">
               <div class="finder-item" onclick="window.desktopManager.openApp('home')">
                 <img src="{% static 'portfolio/images/icons/apps/home.svg' %}" class="finder-file-icon">
-                <div class="finder-file-name">Portfolio Home</div>
+                <div class="finder-file-name">Profile</div>
                 <div class="finder-file-type">Application</div>
               </div>
               
@@ -606,13 +590,13 @@
               </div>
               
               <div class="finder-item" onclick="window.open('https://github.com/suchitsharma2004', '_blank')">
-                <img src="{% static 'portfolio/images/icons/apps/projects.svg' %}" class="finder-file-icon">
+                <img src="{% static 'portfolio/images/icons/apps/github.svg' %}" class="finder-file-icon">
                 <div class="finder-file-name">GitHub</div>
                 <div class="finder-file-type">Web Link</div>
               </div>
               
               <div class="finder-item" onclick="window.open('https://www.linkedin.com/in/suchit-sharma2004/', '_blank')">
-                <img src="{% static 'portfolio/images/icons/apps/contact.svg' %}" class="finder-file-icon">
+                <img src="{% static 'portfolio/images/icons/apps/linkedin.svg' %}" class="finder-file-icon">
                 <div class="finder-file-name">LinkedIn</div>
                 <div class="finder-file-type">Web Link</div>
               </div>
@@ -634,34 +618,34 @@
                   <img src="{% static 'portfolio/images/icons/apps/my-pic.jpeg' %}" alt="Profile" class="profile-avatar">
                 </div>
                 <h1 class="profile-name">Suchit Sharma</h1>
-                <p class="profile-title">AI/ML Researcher & Python Backend Developer</p>
-                <p class="profile-description">
-                  Passionate about <strong>Artificial Intelligence</strong> and <strong>Machine Learning</strong>, with active research contributions in multimedia applications. 
-                  Published researcher with expertise in <em>Django backend development</em>, computer vision, and data science.
-                </p>
-                
-                <div class="research-highlight mt-3 mb-4">
-                  <h6>📄 Recent Publication</h6>
-                  <p class="small">
-                    <strong>Multimedia Tools and Applications</strong><br>
-                    <a href="https://link.springer.com/article/10.1007/s11042-025-20772-8" target="_blank" class="publication-link">
-                      View Research Paper →
-                    </a>
-                  </p>
-                </div>
-                
-                <div class="skills-preview mt-4">
-                  <h5>🚀 Technical Expertise</h5>
-                  <div class="skill-tags">
-                    <span class="skill-tag ai-ml">AI/ML</span>
-                    <span class="skill-tag">TensorFlow</span>
-                    <span class="skill-tag">Python</span>
-                    <span class="skill-tag">Django</span>
-                    <span class="skill-tag">Data Science</span>
-                    <span class="skill-tag">OpenCV</span>
-                    <span class="skill-tag">Research</span>
-                  </div>
-                </div>
+<p class="profile-title">
+  AI Engineer, Backend Developer & Researcher
+</p>
+
+<p class="profile-description">
+  I build scalable AI-powered applications using <strong>Python</strong>, <strong>LLMs</strong>, and modern backend frameworks. 
+  Passionate about Generative AI, Retrieval-Augmented Generation (RAG), automation systems, and applied machine learning research.
+</p>
+
+              
+<div class="skills-preview mt-4">
+  <h5>Technical Expertise</h5>
+  <div class="skill-tags">
+    <span class="skill-tag">Generative AI</span>
+    <span class="skill-tag">Python</span>
+    <span class="skill-tag">Django</span>
+    <span class="skill-tag">FastAPI</span>
+    <span class="skill-tag">RAG Systems</span>
+    <span class="skill-tag">LLMs</span>
+    <span class="skill-tag">TensorFlow</span>
+    <span class="skill-tag">OpenCV</span>
+    <span class="skill-tag">LangChain</span>
+    <span class="skill-tag">AWS Lambda</span>
+    <span class="skill-tag">Research</span>
+  </div>
+</div>
+
+
               </div>
             </div>
             
@@ -681,7 +665,7 @@
                     </p>
                   </iframe>
                   <div class="resume-actions-compact">
-                    <a href="{% static 'portfolio/images/icons/apps/resume_1.pdf' %}" target="_blank" class="btn btn-outline-primary btn-sm">
+                    <a href="{% static 'portfolio/images/icons/apps/resume_1.pdf' %}" target="_blank" class="btn btn-primary btn-sm">
                       <img src="{% static 'portfolio/images/icons/system/info.svg' %}" alt="View" class="inline-icon">
                       View Full
                     </a>
@@ -704,36 +688,25 @@
             <h4 style="color: var(--text-primary);">Featured Projects</h4>
           </div>
           <div class="row">
+            <!-- NeuraRAG -->
             <div class="col-md-6 mb-4">
-              <div class="skill-card clickable-card" onclick="window.open('https://github.com/suchitsharma2004/SignSetu', '_blank')" style="cursor: pointer;">
+              <div class="skill-card clickable-card" onclick="window.open('https://github.com/suchitsharma2004/NeuraRAG', '_blank')" style="cursor: pointer;">
                 <div class="skill-icon">
-                  <img src="{% static 'portfolio/images/icons/apps/projects.svg' %}" alt="SignSetu" class="skill-svg">
+                  <img src="{% static 'portfolio/images/icons/apps/projects.svg' %}" alt="NeuraRAG" class="skill-svg">
                 </div>
-                <h5 style="color: var(--text-primary); font-weight: 600;">SignSetu - Indian Sign Language Detection</h5>
-                <p style="color: var(--text-secondary); font-size: 0.9rem;">AI-powered software for ISL-to-text conversion, potentially benefiting 8M+ deaf children in India.</p>
+                <h5 style="color: var(--text-primary); font-weight: 600;">NeuraRAG - Retrieval Augmented Generation</h5>
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">Custom RAG system using FAISS and Sentence Transformers for embedding generation and document retrieval, with semantic search via a Django REST backend for scalable vector similarity retrieval and LLM-powered responses.</p>
                 <div class="d-flex gap-1 mb-2 flex-wrap justify-content-center">
                   <span class="badge bg-warning text-dark">Python</span>
-                  <span class="badge bg-info">MediaPipe</span>
-                  <span class="badge bg-primary">OpenCV</span>
+                  <span class="badge bg-primary">Django REST</span>
+                  <span class="badge bg-info">FAISS</span>
+                  <span class="badge bg-secondary">Sentence Transformers</span>
                 </div>
                 <small style="color: var(--text-secondary); font-style: italic;">Click to view on GitHub</small>
               </div>
             </div>
-            <div class="col-md-6 mb-4">
-              <div class="skill-card clickable-card" onclick="window.open('https://github.com/suchitsharma2004/DermDetect', '_blank')" style="cursor: pointer;">
-                <div class="skill-icon">
-                  <img src="{% static 'portfolio/images/icons/apps/contact.svg' %}" alt="DermDetect" class="skill-svg">
-                </div>
-                <h5 style="color: var(--text-primary); font-weight: 600;">DermDetect - Skin Disease Detection</h5>
-                <p style="color: var(--text-secondary); font-size: 0.9rem;">Web platform with 97% accuracy in skin disease detection using advanced ML algorithms.</p>
-                <div class="d-flex gap-1 mb-2 flex-wrap justify-content-center">
-                  <span class="badge bg-warning text-dark">Python</span>
-                  <span class="badge bg-danger">TensorFlow</span>
-                  <span class="badge bg-primary">OpenCV</span>
-                </div>
-                <small style="color: var(--text-secondary); font-style: italic;">Click to view on GitHub</small>
-              </div>
-            </div>
+
+            <!-- FlowMail -->
             <div class="col-md-6 mb-4">
               <div class="skill-card clickable-card" onclick="window.open('https://github.com/suchitsharma2004/FlowMail', '_blank')" style="cursor: pointer;">
                 <div class="skill-icon">
@@ -749,17 +722,36 @@
                 <small style="color: var(--text-secondary); font-style: italic;">Click to view on GitHub</small>
               </div>
             </div>
+
+            <!-- SignSetu -->
             <div class="col-md-6 mb-4">
-              <div class="skill-card clickable-card" onclick="window.open('https://github.com/suchitsharma2004/My_portfolio', '_blank')" style="cursor: pointer;">
+              <div class="skill-card clickable-card" onclick="window.open('https://github.com/suchitsharma2004/SignSetu', '_blank')" style="cursor: pointer;">
                 <div class="skill-icon">
-                  <img src="{% static 'portfolio/images/icons/apps/projects.svg' %}" alt="Portfolio" class="skill-svg">
+                  <img src="{% static 'portfolio/images/icons/apps/projects.svg' %}" alt="SignSetu" class="skill-svg">
                 </div>
-                <h5 style="color: var(--text-primary); font-weight: 600;">macOS Portfolio Website</h5>
-                <p style="color: var(--text-secondary); font-size: 0.9rem;">Interactive portfolio with authentic macOS interface design and AI-powered terminal assistant.</p>
+                <h5 style="color: var(--text-primary); font-weight: 600;">SignSetu - Indian Sign Language Detection</h5>
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">AI-powered software for ISL-to-text conversion, potentially benefiting 8M+ deaf children in India.</p>
                 <div class="d-flex gap-1 mb-2 flex-wrap justify-content-center">
-                  <span class="badge bg-success">Django</span>
-                  <span class="badge bg-primary">JavaScript</span>
-                  <span class="badge bg-info">CSS3</span>
+                  <span class="badge bg-warning text-dark">Python</span>
+                  <span class="badge bg-info">MediaPipe</span>
+                  <span class="badge bg-primary">OpenCV</span>
+                </div>
+                <small style="color: var(--text-secondary); font-style: italic;">Click to view on GitHub</small>
+              </div>
+            </div>
+
+            <!-- DermDetect -->
+            <div class="col-md-6 mb-4">
+              <div class="skill-card clickable-card" onclick="window.open('https://github.com/suchitsharma2004/DermDetect', '_blank')" style="cursor: pointer;">
+                <div class="skill-icon">
+                  <img src="{% static 'portfolio/images/icons/apps/projects.svg' %}" alt="DermDetect" class="skill-svg">
+                </div>
+                <h5 style="color: var(--text-primary); font-weight: 600;">DermDetect - Skin Disease Detection</h5>
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">Web platform with 97% accuracy in skin disease detection using advanced ML algorithms.</p>
+                <div class="d-flex gap-1 mb-2 flex-wrap justify-content-center">
+                  <span class="badge bg-warning text-dark">Python</span>
+                  <span class="badge bg-danger">TensorFlow</span>
+                  <span class="badge bg-primary">OpenCV</span>
                 </div>
                 <small style="color: var(--text-secondary); font-style: italic;">Click to view on GitHub</small>
               </div>
@@ -779,19 +771,12 @@
               <p>I'm always open to discussing new opportunities!</p>
               <div class="contact-info">
                 <div class="contact-item">
-                  <img src="{% static 'portfolio/images/icons/apps/contact.svg' %}" alt="Email" class="inline-icon">
                   <strong>Email:</strong> suchit.sharma.delhi@gmail.com
                 </div>
                 <div class="contact-item">
-                  <img src="{% static 'portfolio/images/icons/apps/phone.png' %}" alt="Phone" class="inline-icon">
-                  <strong>Phone:</strong> +91 9311294118
-                </div>
-                <div class="contact-item">
-                  <img src="{% static 'portfolio/images/icons/apps/github.png' %}" alt="GitHub" class="inline-icon">
                   <strong>GitHub:</strong> <a href="https://github.com/suchitsharma2004" target="_blank">suchitsharma2004</a>
                 </div>
                 <div class="contact-item">
-                  <img src="{% static 'portfolio/images/icons/apps/linkedin.png' %}" alt="LinkedIn" class="inline-icon">
                   <strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/suchit-sharma2004/" target="_blank">suchit-sharma2004</a>
                 </div>
               </div>
@@ -829,7 +814,7 @@
             <div>suchit@portfolio ~ %</div>
             <br>
             <div style="color: #fff;">Welcome to Suchit's AI-Powered Terminal!</div>
-            <div style="color: #ccc;">This terminal is powered by Mistral 7B AI assistant.</div>
+            <div style="color: #ccc;">This terminal is powered by AI.</div>
             <div style="color: #ccc;">Ask me anything about Suchit Sharma or his work!</div>
             <br>
             <div id="terminal-output"></div>
@@ -911,7 +896,7 @@
       
       // Show initial help
       addTerminalLine('💡 Try asking: "What are Suchit\'s skills?" or "Tell me about his projects"', '#ccc');
-      addTerminalLine('📱 Built-in commands: clear, help, skills, projects', '#666');
+      addTerminalLine('Built-in commands: clear, help, skills, projects', '#666');
     }
     
     function addTerminalLine(text, color = '#00ff00', className = '') {
@@ -980,7 +965,7 @@
     
     async function sendToLLM(message, loadingElement) {
       try {
-        const response = await fetch('/api/llm-chat/', {
+        const response = await fetch('/api/gemini-chat/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
